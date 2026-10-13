@@ -1109,14 +1109,14 @@ export default function StudyRoomPage() {
     }
   };
 
-  // 📏 Resizing Handlers
+  // 📏 Resizing Handlers (Bars move all the way smoothly)
   const handleStartSplitResize = (e) => {
     e.preventDefault();
     const handleMove = (moveEvent) => {
       if (!workspaceRef.current) return;
       const rect = workspaceRef.current.getBoundingClientRect();
       const newPercent = ((moveEvent.clientX - rect.left) / rect.width) * 100;
-      setSplitPercent(Math.max(35, Math.min(75, newPercent)));
+      setSplitPercent(Math.max(5, Math.min(95, newPercent)));
     };
     const handleUp = () => {
       document.body.style.userSelect = "";
@@ -1135,7 +1135,7 @@ export default function StudyRoomPage() {
       if (!leftPane) return;
       const rect = leftPane.getBoundingClientRect();
       const newPercent = ((moveEvent.clientX - rect.left) / rect.width) * 100;
-      setProblemSplitPercent(Math.max(25, Math.min(60, newPercent)));
+      setProblemSplitPercent(Math.max(5, Math.min(95, newPercent)));
     };
     const handleUp = () => {
       document.body.style.userSelect = "";
@@ -1912,17 +1912,15 @@ export default function StudyRoomPage() {
         {(viewMode === "split" || viewMode === "code") && (
           <div
             style={{ width: viewMode === "split" ? `${splitPercent}%` : "100%" }}
-            className={`flex flex-col border-r border-slate-800 bg-[#1e1e1e] h-full overflow-hidden ${
-              viewMode === "split" ? "min-w-[280px] sm:min-w-[340px] max-w-[calc(100%-240px)]" : "min-w-0"
-            }`}
+            className="flex flex-col border-r border-slate-800 bg-[#1e1e1e] h-full overflow-hidden min-w-0"
           >
             {/* Split row: Problem Panel (Left) & Editor Pane (Right) */}
-            <div className="flex-1 flex min-h-0 overflow-hidden">
+            <div className="flex-1 flex min-h-0 overflow-hidden min-w-0">
               {/* Collapsible LeetCode Problem Statement Panel */}
               {activeProblem && showProblemPanel && (
                 <div
                   style={{ width: `${problemSplitPercent}%` }}
-                  className="border-r border-slate-800 bg-slate-900/90 flex flex-col overflow-hidden shrink-0 min-w-[180px] max-w-[65%]"
+                  className="border-r border-slate-800 bg-slate-900/90 flex flex-col overflow-hidden shrink-0 min-w-0"
                 >
                   <div className="h-8 bg-slate-900 border-b border-slate-800 px-3 flex items-center justify-between text-xs shrink-0">
                     <div className="flex items-center gap-2 truncate">
@@ -1950,11 +1948,11 @@ export default function StudyRoomPage() {
                     </button>
                   </div>
 
-                  {/* Formatted HTML Problem Statement */}
-                  <div className="flex-1 p-3 sm:p-4 overflow-y-auto text-xs text-slate-300 leading-relaxed space-y-4 select-text custom-scrollbar">
+                  {/* Formatted HTML Problem Statement with Margins & Testcase Borders */}
+                  <div className="flex-1 p-3.5 sm:p-5 overflow-y-auto select-text custom-scrollbar">
                     <div
                       dangerouslySetInnerHTML={{ __html: activeProblem.content }}
-                      className="prose prose-invert prose-xs max-w-none [&_pre]:bg-slate-950 [&_pre]:border [&_pre]:border-slate-800 [&_code]:text-indigo-300 [&_pre]:custom-scrollbar"
+                      className="leetcode-content max-w-none"
                     />
                     <div className="pt-4 border-t border-slate-800/80 flex flex-wrap gap-1">
                       {activeProblem.topicTags?.map((tag) => (
@@ -2003,87 +2001,38 @@ export default function StudyRoomPage() {
                     )}
                   </div>
 
-                  {/* Right Actions: Secondary Tools + RUN & SUBMIT ALWAYS FRONT & CENTER */}
-                  <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-auto">
-                    {/* Font size adjustment */}
-                    <div className="hidden xl:flex items-center gap-1 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/60 text-[10px] text-slate-400 shrink-0">
-                      <button
-                        onClick={() => setFontSize((s) => Math.max(11, s - 1))}
-                        className="hover:text-white px-1 font-mono font-bold"
-                        title="Decrease font size"
-                      >
-                        A-
-                      </button>
-                      <span className="text-slate-500 font-mono text-[9px]">{fontSize}</span>
-                      <button
-                        onClick={() => setFontSize((s) => Math.min(22, s + 1))}
-                        className="hover:text-white px-1 font-mono font-bold"
-                        title="Increase font size"
-                      >
-                        A+
-                      </button>
-                    </div>
-
-                    {/* Copy code button */}
-                    <button
-                      onClick={handleCopyEditorCode}
-                      className="p-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition border border-slate-700/60 shrink-0"
-                      title="Copy code to clipboard"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-
-                    {/* Format code button */}
-                    <button
-                      onClick={handleFormatCode}
-                      className="hidden lg:flex items-center gap-1 px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition border border-slate-700/60 shrink-0"
-                      title="Format code"
-                    >
-                      <AlignLeft className="w-3.5 h-3.5 text-indigo-400" />
-                      <span className="hidden 2xl:inline">Format</span>
-                    </button>
-
+                  {/* Right Actions: Clean toolbar with Run & Submit */}
+                  <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                     {/* Reset starter code button */}
                     <button
                       onClick={handleResetCode}
-                      className="hidden lg:flex items-center gap-1 px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition border border-slate-700/60 shrink-0"
+                      className="flex items-center gap-1 px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition border border-slate-700/60 shrink-0"
                       title="Reset to starter code"
                     >
                       <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="hidden 2xl:inline">Reset</span>
+                      <span className="hidden sm:inline">Reset</span>
                     </button>
 
-                    {/* 🚀 RUN CODE BUTTON (NEVER HIDDEN) */}
+                    {/* 🚀 RUN CODE BUTTON */}
                     <button
                       onClick={handleRunCode}
                       disabled={isRunning || isSubmitting}
-                      className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 disabled:opacity-50 text-slate-200 border border-slate-700 font-semibold text-xs rounded-lg shadow-sm transition shrink-0"
+                      className="flex items-center gap-1 sm:gap-1.5 px-3 py-1 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 disabled:opacity-50 text-slate-200 border border-slate-700 font-semibold text-xs rounded-lg shadow-sm transition shrink-0"
                       title="Run code against test cases"
                     >
                       <Play className="w-3.5 h-3.5 fill-slate-200" />
                       <span>{isRunning ? "Running..." : "Run"}</span>
                     </button>
 
-                    {/* 🏆 SUBMIT SOLUTION BUTTON (NEVER HIDDEN) */}
+                    {/* 🏆 SUBMIT SOLUTION BUTTON */}
                     <button
                       onClick={handleSubmitSolution}
                       disabled={isRunning || isSubmitting}
-                      className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-50 text-white font-semibold text-xs rounded-lg shadow-sm transition shadow-emerald-600/20 shrink-0"
+                      className="flex items-center gap-1 sm:gap-1.5 px-3 py-1 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-50 text-white font-semibold text-xs rounded-lg shadow-sm transition shadow-emerald-600/20 shrink-0"
                       title="Run all testcases and submit to history"
                     >
                       <CheckCheck className="w-3.5 h-3.5" />
                       <span>{isSubmitting ? "Submitting..." : "Submit"}</span>
-                    </button>
-
-                    {/* ✨ AI COACH HINT TRIGGER */}
-                    <button
-                      onClick={() => handleAskAICoach("hint")}
-                      disabled={aiLoading}
-                      className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 bg-indigo-600/15 hover:bg-indigo-600/25 border border-indigo-500/30 text-indigo-300 font-semibold text-xs rounded-lg transition shrink-0"
-                      title="Get progressive hint from Gemini AI Coach"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                      <span className="hidden sm:inline">AI Hint</span>
                     </button>
                   </div>
                 </div>
@@ -2095,8 +2044,16 @@ export default function StudyRoomPage() {
                     language={language}
                     theme="vs-dark"
                     value={code}
-                    onMount={(editor) => {
+                    onMount={(editor, monaco) => {
                       editorRef.current = editor;
+
+                      // Support Ctrl + / Cmd + and Ctrl - / Cmd - zoom
+                      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal, () => {
+                        setFontSize((s) => Math.min(26, s + 1));
+                      });
+                      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus, () => {
+                        setFontSize((s) => Math.max(10, s - 1));
+                      });
                     }}
                     onChange={handleCodeChange}
                     options={{
@@ -2582,9 +2539,7 @@ export default function StudyRoomPage() {
         {(viewMode === "split" || viewMode === "chat") && (
           <div
             style={{ width: viewMode === "split" ? `${100 - splitPercent}%` : "100%" }}
-            className={`flex flex-col bg-slate-950 h-full overflow-hidden ${
-              viewMode === "split" ? "min-w-[240px] sm:min-w-[280px] max-w-[calc(100%-280px)]" : "min-w-0"
-            }`}
+            className="flex flex-col bg-slate-950 h-full overflow-hidden min-w-0"
           >
             {/* Online Peers Roster Strip */}
             <div className="px-4 py-2 bg-slate-900/60 border-b border-slate-800 flex items-center gap-2 overflow-x-auto text-xs shrink-0">
