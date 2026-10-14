@@ -42,6 +42,7 @@ import {
   X,
   BookOpen,
   ChevronRight,
+  ChevronLeft,
   Play,
   Terminal,
   ChevronUp,
@@ -249,6 +250,7 @@ export default function StudyRoomPage() {
   const [language, setLanguage] = useState("javascript");
   const [notes, setNotes] = useState("");
   const [viewMode, setViewMode] = useState("split"); // 'split' | 'code' | 'notes' | 'chat' | 'whiteboard'
+  const [showChatPanel, setShowChatPanel] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [unreadChatCount, setUnreadChatCount] = useState(0);
 
@@ -1678,9 +1680,12 @@ export default function StudyRoomPage() {
           {/* View Mode Tabs (Single view buttons for mobile, Split for tablet/desktop) */}
           <div className="flex items-center bg-slate-800/80 p-0.5 rounded-lg border border-slate-700/80 text-xs shrink-0">
             <button
-              onClick={() => setViewMode("code")}
+              onClick={() => {
+                setViewMode("code");
+                setShowChatPanel(false);
+              }}
               className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md transition ${
-                viewMode === "code"
+                viewMode === "code" && !showChatPanel
                   ? "bg-indigo-600 text-white font-medium"
                   : "text-slate-400 hover:text-slate-200"
               }`}
@@ -1690,11 +1695,14 @@ export default function StudyRoomPage() {
               <span className="hidden md:inline">Editor</span>
             </button>
             <button
-              onClick={() => setViewMode("split")}
+              onClick={() => {
+                setViewMode("split");
+                setShowChatPanel(true);
+              }}
               className={`items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md transition ${
                 isMobile ? "hidden" : "flex"
               } ${
-                viewMode === "split"
+                viewMode === "split" && showChatPanel
                   ? "bg-indigo-600 text-white font-medium"
                   : "text-slate-400 hover:text-slate-200"
               }`}
@@ -1892,13 +1900,42 @@ export default function StudyRoomPage() {
         {/* 1. MONACO CODE EDITOR + LEETCODE PANEL + TESTCASES CONSOLE */}
         {(viewMode === "split" || viewMode === "code") && (
           <div
-            style={{ width: viewMode === "split" ? `${splitPercent}%` : "100%" }}
+            style={{ width: viewMode === "split" && showChatPanel ? `${splitPercent}%` : "100%" }}
             className={`flex flex-col border-r border-slate-800 bg-[#1e1e1e] h-full overflow-hidden ${
-              viewMode === "split" ? "min-w-0 md:min-w-[420px]" : "min-w-0"
+              viewMode === "split" && showChatPanel ? "min-w-0 md:min-w-[420px]" : "min-w-0"
             }`}
           >
             {/* Split row: Problem Panel (Left) & Editor Pane (Right) */}
             <div className="flex-1 flex min-h-0 overflow-hidden min-w-0">
+              {/* Collapsed Left Sidebar Strip for Problem Statement (< / >) */}
+              {activeProblem && !showProblemPanel && !isMobile && (
+                <div
+                  onClick={() => setShowProblemPanel(true)}
+                  className="w-8 sm:w-9 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-2.5 justify-between shrink-0 hover:bg-slate-800/80 cursor-pointer transition select-none group z-10"
+                  title="Expand problem statement (>)"
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowProblemPanel(true);
+                    }}
+                    className="p-1 text-slate-400 group-hover:text-white hover:bg-slate-800 rounded transition"
+                    title="Expand problem statement (>)"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex flex-col items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-amber-400" />
+                    <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] text-slate-400 font-semibold tracking-wider group-hover:text-slate-200 uppercase whitespace-nowrap">
+                      #{activeProblem.questionFrontendId} Problem
+                    </span>
+                  </div>
+
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400/80" />
+                </div>
+              )}
+
               {/* Collapsible LeetCode Problem Statement Panel (Overlay or full-width on mobile, split on desktop) */}
               {activeProblem && showProblemPanel && (
                 <div
@@ -1926,10 +1963,10 @@ export default function StudyRoomPage() {
                     </div>
                     <button
                       onClick={() => setShowProblemPanel(false)}
-                      className="p-1 text-slate-400 hover:text-white rounded transition shrink-0 ml-1 bg-slate-800 sm:bg-transparent"
-                      title="Close problem panel"
+                      className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition shrink-0 ml-1"
+                      title="Collapse problem statement (<)"
                     >
-                      <X className="w-4 h-4" />
+                      <ChevronLeft className="w-4 h-4" />
                     </button>
                   </div>
 
@@ -2489,7 +2526,7 @@ export default function StudyRoomPage() {
         )}
 
         {/* Draggable Divider between Editor and Chat in Split Mode */}
-        {viewMode === "split" && (
+        {viewMode === "split" && showChatPanel && (
           <div
             onPointerDown={handleStartSplitResize}
             className="w-1.5 hover:w-2 bg-slate-800 hover:bg-indigo-500/80 active:bg-indigo-500 cursor-col-resize transition-all shrink-0 select-none z-10 flex items-center justify-center group hidden md:flex"
@@ -2528,14 +2565,14 @@ export default function StudyRoomPage() {
         )}
 
         {/* 3. CHAT FEED */}
-        {(viewMode === "split" || viewMode === "chat") && (
+        {(viewMode === "chat" || (viewMode === "split" && showChatPanel)) && (
           <div
             style={{ width: viewMode === "split" ? `${100 - splitPercent}%` : "100%" }}
             className={`flex flex-col bg-slate-950 h-full overflow-hidden ${
               viewMode === "split" ? "min-w-0 md:min-w-[280px]" : "min-w-0"
             }`}
           >
-            {/* Online Peers Roster Strip with Close Button */}
+            {/* Online Peers Roster Strip with Collapse Button (>) */}
             <div className="px-3 sm:px-4 py-2 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between text-xs shrink-0 gap-2">
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-none min-w-0">
                 <Users className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
@@ -2555,13 +2592,19 @@ export default function StudyRoomPage() {
                 </div>
               </div>
 
-              {/* Close Chat Panel (switches to code editor view) */}
+              {/* Collapse Chat Panel (>) */}
               <button
-                onClick={() => setViewMode("code")}
+                onClick={() => {
+                  if (isMobile) {
+                    setViewMode("code");
+                  } else {
+                    setShowChatPanel(false);
+                  }
+                }}
                 className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition shrink-0 ml-1"
-                title="Close chat panel"
+                title="Collapse chat panel (>)"
               >
-                <X className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
@@ -2630,6 +2673,45 @@ export default function StudyRoomPage() {
                   <Send className="w-3.5 h-3.5" />
                 </button>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Collapsed Right Sidebar Strip for Chat (< / >) */}
+        {((viewMode === "split" && !showChatPanel) || viewMode === "code") && !isMobile && (
+          <div
+            onClick={() => {
+              setShowChatPanel(true);
+              setViewMode("split");
+            }}
+            className="w-8 sm:w-9 bg-slate-900 border-l border-slate-800 flex flex-col items-center py-2.5 justify-between shrink-0 hover:bg-slate-800/80 cursor-pointer transition select-none group z-10"
+            title="Expand chat panel (<)"
+          >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowChatPanel(true);
+                setViewMode("split");
+              }}
+              className="p-1 text-slate-400 group-hover:text-white hover:bg-slate-800 rounded transition"
+              title="Expand chat panel (<)"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <div className="flex flex-col items-center gap-2 relative">
+              <MessageSquare className="w-4 h-4 text-indigo-400" />
+              {unreadChatCount > 0 && (
+                <span className="w-2 h-2 rounded-full bg-rose-500 absolute -top-1 -right-1" />
+              )}
+              <span className="[writing-mode:vertical-rl] text-[10px] text-slate-400 font-semibold tracking-wider group-hover:text-slate-200 uppercase whitespace-nowrap">
+                Chat
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-[10px] text-slate-500 font-mono">{onlineUsers.length}</span>
             </div>
           </div>
         )}
