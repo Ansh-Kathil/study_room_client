@@ -968,22 +968,31 @@ export default function StudyRoomPage() {
     }
   };
 
-  // 🤖 Ask AI Coding Coach (Gemini 3.8 Flash)
+  // 🤖 Ask AI Coding Coach (Gemini AI)
   const handleAskAICoach = async (action, customQuestion = "") => {
     setAiLoading(true);
     setShowConsole(true);
     setConsoleTab("ai");
 
     const requestedHintLevel = action === "hint" ? hintLevel : undefined;
+    const currentCode = editorRef.current ? editorRef.current.getValue() : code;
 
     try {
       const data = await apiRequest("/ai/coach", {
         method: "POST",
         body: JSON.stringify({
           action,
-          code,
+          code: currentCode,
           language,
-          problem: activeProblem,
+          problem: activeProblem
+            ? {
+                title: activeProblem.title,
+                questionFrontendId: activeProblem.questionFrontendId,
+                difficulty: activeProblem.difficulty,
+                content: activeProblem.content,
+                topicTags: activeProblem.topicTags,
+              }
+            : null,
           errorContext: executionResult,
           hintLevel: requestedHintLevel,
           question: customQuestion || aiQuestion,
@@ -1124,14 +1133,19 @@ export default function StudyRoomPage() {
     }
   };
 
-  // 📏 Resizing Handlers (Bars move all the way smoothly)
+  // 📏 Resizing Handlers (Respecting desktop minimum section widths)
   const handleStartSplitResize = (e) => {
     e.preventDefault();
     const handleMove = (moveEvent) => {
       if (!workspaceRef.current) return;
       const rect = workspaceRef.current.getBoundingClientRect();
       const newPercent = ((moveEvent.clientX - rect.left) / rect.width) * 100;
-      setSplitPercent(Math.max(5, Math.min(95, newPercent)));
+
+      // Minimum widths: Editor/Problem pane min 420px, Chat pane min 280px
+      const minLeftPct = Math.min(45, (420 / rect.width) * 100);
+      const maxLeftPct = Math.max(55, ((rect.width - 280) / rect.width) * 100);
+
+      setSplitPercent(Math.max(minLeftPct, Math.min(maxLeftPct, newPercent)));
     };
     const handleUp = () => {
       document.body.style.userSelect = "";
@@ -1150,7 +1164,12 @@ export default function StudyRoomPage() {
       if (!leftPane) return;
       const rect = leftPane.getBoundingClientRect();
       const newPercent = ((moveEvent.clientX - rect.left) / rect.width) * 100;
-      setProblemSplitPercent(Math.max(5, Math.min(95, newPercent)));
+
+      // Minimum widths: Question panel min 260px, Editor min 340px
+      const minProbPct = Math.min(35, (260 / rect.width) * 100);
+      const maxProbPct = Math.max(65, ((rect.width - 340) / rect.width) * 100);
+
+      setProblemSplitPercent(Math.max(minProbPct, Math.min(maxProbPct, newPercent)));
     };
     const handleUp = () => {
       document.body.style.userSelect = "";
@@ -1656,37 +1675,6 @@ export default function StudyRoomPage() {
             </button>
           )}
 
-          {/* Toggle Problem Description Panel */}
-          {activeProblem && (
-            <button
-              onClick={() => setShowProblemPanel(!showProblemPanel)}
-              className={`flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs rounded-lg border transition shrink-0 ${
-                showProblemPanel
-                  ? "bg-slate-800 border-indigo-500/50 text-indigo-400 font-medium"
-                  : "bg-slate-800/60 border-slate-700 text-slate-400"
-              }`}
-              title="Toggle Problem Statement Panel"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">#{activeProblem.questionFrontendId}</span>
-            </button>
-          )}
-
-          {/* Language Dropdown */}
-          {(viewMode === "code" || viewMode === "split") && (
-            <select
-              value={language}
-              onChange={(e) => handleLanguageChange(e.target.value)}
-              className="bg-slate-800 border border-slate-700 text-xs text-indigo-300 font-medium rounded-lg px-2 sm:px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer shrink-0"
-            >
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <option key={lang.id} value={lang.id} className="bg-slate-900 text-slate-200">
-                  {lang.label}
-                </option>
-              ))}
-            </select>
-          )}
-
           {/* View Mode Tabs (Single view buttons for mobile, Split for tablet/desktop) */}
           <div className="flex items-center bg-slate-800/80 p-0.5 rounded-lg border border-slate-700/80 text-xs shrink-0">
             <button
@@ -1788,17 +1776,6 @@ export default function StudyRoomPage() {
             userName={user?.name || "Candidate"}
           />
 
-          {/* Interview Prep Hub Link */}
-          <Link
-            href="/interview-prep"
-            target="_blank"
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300 rounded-lg text-xs font-medium transition shrink-0"
-            title="Open Interview Prep Hub (Blind 75 & STAR Guide)"
-          >
-            <Trophy className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden xl:inline">Prep Hub</span>
-          </Link>
-
           {/* Voice & Video Call Header Action */}
           {!isInCall ? (
             <button
@@ -1832,19 +1809,6 @@ export default function StudyRoomPage() {
               </button>
             </div>
           )}
-
-          {/* Invite Button */}
-          <button
-            onClick={() => {
-              setShowInviteModal(true);
-              setInviteStatus({ loading: false, success: "", error: "" });
-            }}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 text-indigo-400 rounded-lg text-xs font-medium transition shrink-0"
-            title="Invite by email"
-          >
-            <Mail className="w-3.5 h-3.5" />
-            <span className="hidden xl:inline">Invite</span>
-          </button>
 
           {/* Export Session Dropdown */}
           <div className="relative shrink-0">
@@ -1929,7 +1893,9 @@ export default function StudyRoomPage() {
         {(viewMode === "split" || viewMode === "code") && (
           <div
             style={{ width: viewMode === "split" ? `${splitPercent}%` : "100%" }}
-            className="flex flex-col border-r border-slate-800 bg-[#1e1e1e] h-full overflow-hidden min-w-0"
+            className={`flex flex-col border-r border-slate-800 bg-[#1e1e1e] h-full overflow-hidden ${
+              viewMode === "split" ? "min-w-0 md:min-w-[420px]" : "min-w-0"
+            }`}
           >
             {/* Split row: Problem Panel (Left) & Editor Pane (Right) */}
             <div className="flex-1 flex min-h-0 overflow-hidden min-w-0">
@@ -1937,8 +1903,8 @@ export default function StudyRoomPage() {
               {activeProblem && showProblemPanel && (
                 <div
                   style={{ width: isMobile ? "100%" : `${problemSplitPercent}%` }}
-                  className={`border-r border-slate-800 bg-slate-900/95 flex flex-col overflow-hidden min-w-0 ${
-                    isMobile ? "absolute inset-0 z-30" : "shrink-0"
+                  className={`border-r border-slate-800 bg-slate-900/95 flex flex-col overflow-hidden ${
+                    isMobile ? "absolute inset-0 z-30" : "shrink-0 min-w-[280px]"
                   }`}
                 >
                   <div className="h-9 bg-slate-900 border-b border-slate-800 px-3 flex items-center justify-between text-xs shrink-0">
@@ -1999,17 +1965,24 @@ export default function StudyRoomPage() {
               )}
 
               {/* Editor Workspace */}
-              <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+              <div className="flex-1 flex flex-col min-w-0 md:min-w-[340px] overflow-hidden">
                 {/* Responsive Editor Header Bar with Run & Submit Always Visible */}
                 <div className="min-h-[40px] bg-slate-900 border-b border-slate-800 px-2 sm:px-3 py-1 flex items-center justify-between text-xs text-slate-400 shrink-0 gap-1.5 overflow-x-auto scrollbar-none">
-                  {/* Left: File name */}
-                  <div className="flex items-center gap-1.5 shrink min-w-0">
-                    <span className="flex items-center gap-1 font-mono text-[11px] text-slate-300 truncate">
-                      <Code2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                      <span className="truncate max-w-[80px] xs:max-w-[120px] sm:max-w-none">
-                        solution.{language === "python" ? "py" : language === "cpp" ? "cpp" : language === "java" ? "java" : "js"}
-                      </span>
-                    </span>
+                  {/* Left: Language Selector */}
+                  <div className="flex items-center gap-1.5 shrink-0 min-w-0">
+                    <Code2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                    <select
+                      value={language}
+                      onChange={(e) => handleLanguageChange(e.target.value)}
+                      className="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-xs text-indigo-300 font-medium rounded-md px-2 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer shrink-0 transition"
+                      title="Select Language"
+                    >
+                      {SUPPORTED_LANGUAGES.map((lang) => (
+                        <option key={lang.id} value={lang.id} className="bg-slate-900 text-slate-200">
+                          {lang.label}
+                        </option>
+                      ))}
+                    </select>
 
                     {/* Peer Typing Presence Pill */}
                     {typingPeer && (
@@ -2558,25 +2531,38 @@ export default function StudyRoomPage() {
         {(viewMode === "split" || viewMode === "chat") && (
           <div
             style={{ width: viewMode === "split" ? `${100 - splitPercent}%` : "100%" }}
-            className="flex flex-col bg-slate-950 h-full overflow-hidden min-w-0"
+            className={`flex flex-col bg-slate-950 h-full overflow-hidden ${
+              viewMode === "split" ? "min-w-0 md:min-w-[280px]" : "min-w-0"
+            }`}
           >
-            {/* Online Peers Roster Strip */}
-            <div className="px-4 py-2 bg-slate-900/60 border-b border-slate-800 flex items-center gap-2 overflow-x-auto text-xs shrink-0">
-              <Users className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-              <span className="text-slate-400 shrink-0 text-[11px] font-medium uppercase tracking-wider">
-                Online ({onlineUsers.length}):
-              </span>
-              <div className="flex items-center gap-1.5 flex-nowrap">
-                {onlineUsers.map((u) => (
-                  <span
-                    key={u.userId}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-800 text-[11px] text-slate-200 whitespace-nowrap border border-slate-700/60"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    {u.name} {u.userId === user?._id && "(You)"}
-                  </span>
-                ))}
+            {/* Online Peers Roster Strip with Close Button */}
+            <div className="px-3 sm:px-4 py-2 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between text-xs shrink-0 gap-2">
+              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none min-w-0">
+                <Users className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="text-slate-400 shrink-0 text-[11px] font-medium uppercase tracking-wider">
+                  Online ({onlineUsers.length}):
+                </span>
+                <div className="flex items-center gap-1.5 flex-nowrap">
+                  {onlineUsers.map((u) => (
+                    <span
+                      key={u.userId}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-800 text-[11px] text-slate-200 whitespace-nowrap border border-slate-700/60"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      {u.name} {u.userId === user?._id && "(You)"}
+                    </span>
+                  ))}
+                </div>
               </div>
+
+              {/* Close Chat Panel (switches to code editor view) */}
+              <button
+                onClick={() => setViewMode("code")}
+                className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition shrink-0 ml-1"
+                title="Close chat panel"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Chat Messages */}
