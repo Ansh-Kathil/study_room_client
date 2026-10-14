@@ -200,38 +200,40 @@ function DashboardContent() {
     <div className="min-h-screen bg-slate-950 text-slate-100">
       {/* Navigation Header */}
       <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-              <BookOpen className="w-5 h-5" />
+        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h1 className="font-bold text-lg leading-tight">Study Room</h1>
-              <p className="text-xs text-slate-400">
-                Logged in as <span className="text-indigo-400 font-medium">{user.name}</span>
+            <div className="min-w-0">
+              <h1 className="font-bold text-base sm:text-lg leading-tight truncate">Study Room</h1>
+              <p className="text-[11px] sm:text-xs text-slate-400 truncate">
+                <span className="hidden xs:inline">Logged in as </span><span className="text-indigo-400 font-medium">{user.name}</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <button
               onClick={() => setActiveTab("mock")}
-              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl transition border ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold rounded-xl transition border ${
                 activeTab === "mock"
                   ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
                   : "text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/20"
               }`}
             >
-              <Briefcase className="w-4 h-4 text-amber-400" />
+              <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
               <span className="hidden sm:inline">Mock Interview Prep</span>
+              <span className="sm:hidden">Mock</span>
             </button>
 
             <button
               onClick={logout}
-              className="flex items-center gap-2 px-3.5 py-2 text-sm text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg transition"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl transition"
+              title="Sign out of account"
             >
-              <LogOut className="w-4 h-4" />
-              <span>Sign Out</span>
+              <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Sign Out</span>
             </button>
           </div>
         </div>

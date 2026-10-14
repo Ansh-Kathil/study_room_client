@@ -248,8 +248,23 @@ export default function StudyRoomPage() {
   const [code, setCode] = useState("");
   const [language, setLanguage] = useState("javascript");
   const [notes, setNotes] = useState("");
-  const [viewMode, setViewMode] = useState("split"); // 'split' | 'code' | 'notes' | 'chat'
+  const [viewMode, setViewMode] = useState("split"); // 'split' | 'code' | 'notes' | 'chat' | 'whiteboard'
+  const [isMobile, setIsMobile] = useState(false);
   const [unreadChatCount, setUnreadChatCount] = useState(0);
+
+  // Responsive screen detection for mobile devices
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile && viewMode === "split") {
+        setViewMode("code");
+      }
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // 🏆 LeetCode & Problem State
   const [showLeetCodeModal, setShowLeetCodeModal] = useState(false);
@@ -1604,8 +1619,8 @@ export default function StudyRoomPage() {
       {/* Toast Notification Container */}
       <Toaster richColors position="bottom-right" theme="dark" />
 
-      {/* Top Navigation Bar */}
-      <header className="min-h-14 h-auto py-1 sm:py-0 border-b border-slate-800 bg-slate-900/90 backdrop-blur-md px-2 sm:px-4 flex items-center justify-between shrink-0 z-40 gap-1.5 sm:gap-2 relative">
+      {/* Top Navigation Bar (Mobile-friendly horizontal scrollbar-none) */}
+      <header className="min-h-14 h-auto py-2 sm:py-0 border-b border-slate-800 bg-slate-900/95 backdrop-blur-md px-2.5 sm:px-4 flex items-center justify-between shrink-0 z-40 gap-2 overflow-x-auto scrollbar-none">
         {/* Left: Room Title & Live Badge */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           <Link
@@ -1617,7 +1632,7 @@ export default function StudyRoomPage() {
           </Link>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <h1 className="font-bold text-xs sm:text-sm md:text-base text-slate-100 truncate max-w-[85px] xs:max-w-[120px] sm:max-w-[170px] md:max-w-xs">
+            <h1 className="font-bold text-xs sm:text-sm md:text-base text-slate-100 truncate max-w-[100px] xs:max-w-[130px] sm:max-w-[180px] md:max-w-xs">
               {room?.name}
             </h1>
             <span className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
@@ -1628,7 +1643,7 @@ export default function StudyRoomPage() {
         </div>
 
         {/* Center: LeetCode Trigger, View Switcher & Language Selector */}
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           {/* 🏆 LeetCode Explorer Button (Hidden if room is a Mock Interview session) */}
           {!room?.name?.toLowerCase().includes("mock") && (
             <button
@@ -1672,7 +1687,7 @@ export default function StudyRoomPage() {
             </select>
           )}
 
-          {/* View Mode Tabs */}
+          {/* View Mode Tabs (Single view buttons for mobile, Split for tablet/desktop) */}
           <div className="flex items-center bg-slate-800/80 p-0.5 rounded-lg border border-slate-700/80 text-xs shrink-0">
             <button
               onClick={() => setViewMode("code")}
@@ -1688,7 +1703,9 @@ export default function StudyRoomPage() {
             </button>
             <button
               onClick={() => setViewMode("split")}
-              className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md transition ${
+              className={`items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md transition ${
+                isMobile ? "hidden" : "flex"
+              } ${
                 viewMode === "split"
                   ? "bg-indigo-600 text-white font-medium"
                   : "text-slate-400 hover:text-slate-200"
@@ -1746,7 +1763,7 @@ export default function StudyRoomPage() {
         </div>
 
         {/* Right: Join Code, Video Call, Invite, Export & Leave */}
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-auto sm:ml-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           {/* Join Code */}
           <button
             onClick={handleCopyCode}
@@ -1916,13 +1933,15 @@ export default function StudyRoomPage() {
           >
             {/* Split row: Problem Panel (Left) & Editor Pane (Right) */}
             <div className="flex-1 flex min-h-0 overflow-hidden min-w-0">
-              {/* Collapsible LeetCode Problem Statement Panel */}
+              {/* Collapsible LeetCode Problem Statement Panel (Overlay or full-width on mobile, split on desktop) */}
               {activeProblem && showProblemPanel && (
                 <div
-                  style={{ width: `${problemSplitPercent}%` }}
-                  className="border-r border-slate-800 bg-slate-900/90 flex flex-col overflow-hidden shrink-0 min-w-0"
+                  style={{ width: isMobile ? "100%" : `${problemSplitPercent}%` }}
+                  className={`border-r border-slate-800 bg-slate-900/95 flex flex-col overflow-hidden min-w-0 ${
+                    isMobile ? "absolute inset-0 z-30" : "shrink-0"
+                  }`}
                 >
-                  <div className="h-8 bg-slate-900 border-b border-slate-800 px-3 flex items-center justify-between text-xs shrink-0">
+                  <div className="h-9 bg-slate-900 border-b border-slate-800 px-3 flex items-center justify-between text-xs shrink-0">
                     <div className="flex items-center gap-2 truncate">
                       <span className="font-bold text-slate-100 truncate">
                         #{activeProblem.questionFrontendId} {activeProblem.title}
@@ -1941,10 +1960,10 @@ export default function StudyRoomPage() {
                     </div>
                     <button
                       onClick={() => setShowProblemPanel(false)}
-                      className="p-1 text-slate-400 hover:text-white rounded transition shrink-0 ml-1"
+                      className="p-1 text-slate-400 hover:text-white rounded transition shrink-0 ml-1 bg-slate-800 sm:bg-transparent"
                       title="Close problem panel"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
 
@@ -1968,8 +1987,8 @@ export default function StudyRoomPage() {
                 </div>
               )}
 
-              {/* Resizable Divider between Problem & Editor */}
-              {activeProblem && showProblemPanel && (
+              {/* Resizable Divider between Problem & Editor (Hidden on mobile) */}
+              {activeProblem && showProblemPanel && !isMobile && (
                 <div
                   onPointerDown={handleStartProblemResize}
                   className="w-1.5 hover:w-2 bg-slate-800 hover:bg-indigo-500/80 active:bg-indigo-500 cursor-col-resize transition-all shrink-0 select-none z-10 flex items-center justify-center group"

@@ -277,7 +277,12 @@ export default function SystemDesignPrimer() {
                     }`}
                   >
                     <button
-                      onClick={() => setSelectedModuleId(mod.id)}
+                      onClick={() => {
+                        setSelectedModuleId(mod.id);
+                        if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                          document.getElementById("module-content-display")?.scrollIntoView({ behavior: "smooth" });
+                        }
+                      }}
                       className="flex-1 text-left space-y-1"
                     >
                       <div className="flex items-center gap-2">
@@ -324,7 +329,7 @@ export default function SystemDesignPrimer() {
           </div>
 
           {/* Right Column: Deep-Dive Content Display */}
-          <div className="lg:col-span-8 space-y-4">
+          <div id="module-content-display" className="lg:col-span-8 space-y-4 scroll-mt-20">
             {activeModule && (
               <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-5 shadow-xl">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
@@ -439,7 +444,12 @@ export default function SystemDesignPrimer() {
                     }`}
                   >
                     <button
-                      onClick={() => setSelectedCaseId(c.id)}
+                      onClick={() => {
+                        setSelectedCaseId(c.id);
+                        if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                          document.getElementById("case-content-display")?.scrollIntoView({ behavior: "smooth" });
+                        }
+                      }}
                       className="flex-1 text-left space-y-1.5"
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -498,7 +508,7 @@ export default function SystemDesignPrimer() {
           </div>
 
           {/* Case Study Detailed Breakdown */}
-          <div className="lg:col-span-8 space-y-4">
+          <div id="case-content-display" className="lg:col-span-8 space-y-4 scroll-mt-20">
             {activeCase && (
               <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-6 shadow-xl">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
