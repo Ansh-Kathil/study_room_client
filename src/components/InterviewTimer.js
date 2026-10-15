@@ -221,7 +221,7 @@ export default function InterviewTimer({ socket, roomId, userName = "You" }) {
 
       {/* Popover Dropdown Panel */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-72 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 p-4 space-y-4 text-xs text-slate-200 animate-in fade-in zoom-in-95">
+        <div className="absolute right-0 top-full mt-2 w-72 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl z-[70] p-4 space-y-4 text-xs text-slate-200 animate-in fade-in zoom-in-95">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
             <div className="flex items-center gap-2">

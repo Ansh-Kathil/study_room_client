@@ -1640,8 +1640,8 @@ export default function StudyRoomPage() {
       {/* Toast Notification Container */}
       <Toaster richColors position="bottom-right" theme="dark" />
 
-      {/* Top Navigation Bar (Mobile-friendly horizontal scrollbar-none) */}
-      <header className="min-h-14 h-auto py-2 sm:py-0 border-b border-slate-800 bg-slate-900/95 backdrop-blur-md px-2.5 sm:px-4 flex items-center justify-between shrink-0 z-40 gap-2 overflow-x-auto scrollbar-none">
+      {/* Top Navigation Bar */}
+      <header className="min-h-14 h-auto py-2 sm:py-0 border-b border-slate-800 bg-slate-900/95 backdrop-blur-md px-2.5 sm:px-4 flex items-center justify-between shrink-0 z-50 gap-2 relative overflow-visible">
         {/* Left: Room Title & Live Badge */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           <Link
@@ -1834,10 +1834,10 @@ export default function StudyRoomPage() {
               <>
                 {/* Backdrop to close on outside click */}
                 <div
-                  className="fixed inset-0 z-40"
+                  className="fixed inset-0 z-[60]"
                   onClick={() => setShowExportMenu(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-56 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 p-1.5 text-xs text-slate-200 animate-in fade-in zoom-in-95">
+                <div className="absolute right-0 top-full mt-2 w-56 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-[70] p-1.5 text-xs text-slate-200 animate-in fade-in zoom-in-95">
                   <button
                     onClick={() => {
                       handleExportSession("markdown");
