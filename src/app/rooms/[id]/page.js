@@ -247,7 +247,13 @@ export default function StudyRoomPage() {
 
   // ⌨️ Code Editor & 📝 Notes State
   const [code, setCode] = useState("");
-  const [language, setLanguage] = useState("javascript");
+  const [language, setLanguage] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("preferred_language");
+      if (saved) return saved;
+    }
+    return "javascript";
+  });
   const [notes, setNotes] = useState("");
   const [viewMode, setViewMode] = useState("split"); // 'split' | 'code' | 'notes' | 'chat' | 'whiteboard'
   const [showChatPanel, setShowChatPanel] = useState(true);
@@ -1522,9 +1528,13 @@ export default function StudyRoomPage() {
     }
   };
 
-  // 🌐 Handle Language Change
   const handleLanguageChange = (newLang) => {
     setLanguage(newLang);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("preferred_language", newLang);
+      } catch (e) {}
+    }
 
     if (activeProblem?.codeSnippets && activeProblem.codeSnippets.length > 0) {
       const langConfig = SUPPORTED_LANGUAGES.find((l) => l.id === newLang);

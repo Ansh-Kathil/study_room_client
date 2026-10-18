@@ -42,38 +42,89 @@ import {
 } from "@/data/interviewPrepData";
 import MockPracticeWorkspace from "@/components/MockPracticeWorkspace";
 import SystemDesignPrimer from "@/components/SystemDesignPrimer";
+import {
+  PREF_KEYS,
+  getStorageItem,
+  setStorageItem,
+  getStorageJSON,
+  setStorageJSON,
+} from "@/lib/preferences";
 
 export default function InterviewPrepPage({ embedded = false }) {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [activeTab, setActiveTab] = useState("dsa"); // 'dsa' | 'behavioral' | 'sysdesign' | 'rubric'
-  const [selectedPattern, setSelectedPattern] = useState("ALL");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("ALL");
+  // Load initial tab and filters from localStorage preferences
+  const [activeTab, setActiveTab] = useState(() => {
+    return getStorageItem(PREF_KEYS.PREP_ACTIVE_TAB, "dsa");
+  });
+  const [selectedPattern, setSelectedPattern] = useState(() => {
+    return getStorageItem(PREF_KEYS.PREP_PATTERN_FILTER, "ALL");
+  });
+  const [selectedDifficulty, setSelectedDifficulty] = useState(() => {
+    return getStorageItem(PREF_KEYS.PREP_DIFF_FILTER, "ALL");
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedProblemId, setExpandedProblemId] = useState(null);
   const [solvedList, setSolvedList] = useState([]);
+  const [behavioralPrepared, setBehavioralPrepared] = useState([]);
+  const [lastPracticedProblem, setLastPracticedProblem] = useState(null);
+  const [preferredLang, setPreferredLang] = useState("javascript");
   const [creatingRoom, setCreatingRoom] = useState(false);
   const [selectedPracticeProblem, setSelectedPracticeProblem] = useState(null);
   const [revealedApproachIds, setRevealedApproachIds] = useState([]);
 
-  // Load solved list from localStorage
+  // Load preferences, solved list, and drafts from localStorage
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("interview_prep_solved");
-      if (saved) setSolvedList(JSON.parse(saved));
-    } catch (e) {}
+    const savedSolved = getStorageJSON(PREF_KEYS.SOLVED_PROBLEMS);
+    if (savedSolved) setSolvedList(savedSolved);
+
+    const savedPrepared = getStorageJSON(PREF_KEYS.BEHAVIORAL_PREPARED);
+    if (savedPrepared) setBehavioralPrepared(savedPrepared);
+
+    const savedLastId = getStorageItem(PREF_KEYS.LAST_PROBLEM_ID);
+    if (savedLastId) {
+      const match = CURATED_PROBLEMS.find((p) => String(p.id) === String(savedLastId));
+      if (match) setLastPracticedProblem(match);
+    }
+
+    const savedLang = getStorageItem(PREF_KEYS.PREFERRED_LANGUAGE, "javascript");
+    setPreferredLang(savedLang);
   }, []);
 
   // Save solved list to localStorage
   const toggleSolved = (id) => {
     setSolvedList((prev) => {
       const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      try {
-        localStorage.setItem("interview_prep_solved", JSON.stringify(next));
-      } catch (e) {}
+      setStorageJSON(PREF_KEYS.SOLVED_PROBLEMS, next);
       return next;
     });
+  };
+
+  // Toggle Behavioral Question Preparedness in localStorage
+  const toggleBehavioralPrepared = (id) => {
+    setBehavioralPrepared((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      setStorageJSON(PREF_KEYS.BEHAVIORAL_PREPARED, next);
+      toast.success(next.includes(id) ? "Marked as rehearsed! ⭐" : "Removed from rehearsed list");
+      return next;
+    });
+  };
+
+  // Handlers that update state and persist preferences
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setStorageItem(PREF_KEYS.PREP_ACTIVE_TAB, tab);
+  };
+
+  const handleDifficultyChange = (diff) => {
+    setSelectedDifficulty(diff);
+    setStorageItem(PREF_KEYS.PREP_DIFF_FILTER, diff);
+  };
+
+  const handlePatternChange = (pat) => {
+    setSelectedPattern(pat);
+    setStorageItem(PREF_KEYS.PREP_PATTERN_FILTER, pat);
   };
 
   // Filter problems
@@ -97,6 +148,8 @@ export default function InterviewPrepPage({ embedded = false }) {
   // Quick Action: Launch Personal Solo Mock Interview Practice
   const handleStartSoloPractice = (problem) => {
     setSelectedPracticeProblem(problem);
+    setLastPracticedProblem(problem);
+    setStorageItem(PREF_KEYS.LAST_PROBLEM_ID, String(problem.id));
     toast.info(`Opened workspace for "${problem.title}" ⏱️`);
   };
 
@@ -207,11 +260,17 @@ export default function InterviewPrepPage({ embedded = false }) {
                 </div>
               </div>
               <button
-                onClick={() => handleStartSoloPractice(CURATED_PROBLEMS[0])}
+                onClick={() =>
+                  handleStartSoloPractice(lastPracticedProblem || CURATED_PROBLEMS[0])
+                }
                 className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/25 transition"
               >
                 <Play className="w-3.5 h-3.5" />
-                <span>Start Two Sum Mock</span>
+                <span>
+                  {lastPracticedProblem
+                    ? `Resume #${lastPracticedProblem.frontendId} ${lastPracticedProblem.title}`
+                    : "Start Two Sum Mock"}
+                </span>
               </button>
             </div>
           </div>
@@ -225,7 +284,11 @@ export default function InterviewPrepPage({ embedded = false }) {
           allProblems={CURATED_PROBLEMS}
           solvedList={solvedList}
           onToggleSolved={toggleSolved}
-          onSelectProblem={(prob) => setSelectedPracticeProblem(prob)}
+          onSelectProblem={(prob) => {
+            setSelectedPracticeProblem(prob);
+            setLastPracticedProblem(prob);
+            setStorageItem(PREF_KEYS.LAST_PROBLEM_ID, String(prob.id));
+          }}
           onClose={handleCloseSoloPractice}
           onProblemSolved={(probId) => {
             if (!solvedList.includes(probId)) {
@@ -239,7 +302,7 @@ export default function InterviewPrepPage({ embedded = false }) {
       <div className={`border-b border-slate-800 bg-slate-900/60 sticky ${embedded ? "top-0" : "top-[57px]"} z-20 backdrop-blur-md`}>
         <div className="max-w-7xl mx-auto px-4 flex items-center gap-1.5 sm:gap-2 overflow-x-auto custom-scrollbar py-2.5">
           <button
-            onClick={() => setActiveTab("dsa")}
+            onClick={() => handleTabChange("dsa")}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shrink-0 ${
               activeTab === "dsa"
                 ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
@@ -251,7 +314,7 @@ export default function InterviewPrepPage({ embedded = false }) {
           </button>
 
           <button
-            onClick={() => setActiveTab("behavioral")}
+            onClick={() => handleTabChange("behavioral")}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shrink-0 ${
               activeTab === "behavioral"
                 ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
@@ -263,7 +326,7 @@ export default function InterviewPrepPage({ embedded = false }) {
           </button>
 
           <button
-            onClick={() => setActiveTab("sysdesign")}
+            onClick={() => handleTabChange("sysdesign")}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shrink-0 ${
               activeTab === "sysdesign"
                 ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
@@ -275,7 +338,7 @@ export default function InterviewPrepPage({ embedded = false }) {
           </button>
 
           <button
-            onClick={() => setActiveTab("rubric")}
+            onClick={() => handleTabChange("rubric")}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shrink-0 ${
               activeTab === "rubric"
                 ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
@@ -306,7 +369,7 @@ export default function InterviewPrepPage({ embedded = false }) {
                 {patternsList.map((pat) => (
                   <button
                     key={pat}
-                    onClick={() => setSelectedPattern(pat)}
+                    onClick={() => handlePatternChange(pat)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition border shrink-0 ${
                       selectedPattern === pat
                         ? "bg-indigo-600 text-white border-indigo-500"
@@ -322,7 +385,7 @@ export default function InterviewPrepPage({ embedded = false }) {
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
                 <select
                   value={selectedDifficulty}
-                  onChange={(e) => setSelectedDifficulty(e.target.value)}
+                  onChange={(e) => handleDifficultyChange(e.target.value)}
                   className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 shrink-0"
                 >
                   <option value="ALL">All Difficulties</option>
@@ -599,9 +662,27 @@ export default function InterviewPrepPage({ embedded = false }) {
                         </span>
                         <h4 className="font-bold text-sm text-slate-100">"{bq.question}"</h4>
                       </div>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-semibold self-start sm:self-auto">
-                        {bq.competency}
-                      </span>
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <button
+                          onClick={() => toggleBehavioralPrepared(bq.id)}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition ${
+                            behavioralPrepared.includes(bq.id)
+                              ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                              : "bg-slate-800 text-slate-400 border-slate-700/60 hover:text-slate-200"
+                          }`}
+                          title={behavioralPrepared.includes(bq.id) ? "Marked as Rehearsed" : "Mark as Rehearsed"}
+                        >
+                          {behavioralPrepared.includes(bq.id) ? (
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          ) : (
+                            <Circle className="w-3.5 h-3.5" />
+                          )}
+                          <span>{behavioralPrepared.includes(bq.id) ? "Rehearsed" : "Mark Rehearsed"}</span>
+                        </button>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-semibold">
+                          {bq.competency}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="text-xs text-slate-400">

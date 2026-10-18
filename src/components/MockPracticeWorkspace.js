@@ -28,6 +28,10 @@ import {
   BookOpen,
   FileCode,
   CheckCheck,
+  Volume2,
+  VolumeX,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
 import { fireAcceptedConfetti } from "@/lib/confetti";
@@ -35,9 +39,16 @@ import { playNotificationSound } from "@/lib/sound";
 import { toast } from "sonner";
 import {
   getProblemStarterSnippet,
-  getDefaultStarterTemplate,
   CURATED_PROBLEMS,
 } from "@/data/interviewPrepData";
+import {
+  PREF_KEYS,
+  getStorageItem,
+  setStorageItem,
+  getSavedCodeDraft,
+  saveCodeDraft,
+  clearCodeDraft,
+} from "@/lib/preferences";
 
 const SUPPORTED_LANGUAGES = [
   { id: "javascript", label: "JavaScript", monaco: "javascript", ext: "js" },
@@ -63,22 +74,55 @@ export default function MockPracticeWorkspace({
   onClose,
   onProblemSolved,
 }) {
-  // Current active problem state
+  // Current active problem
   const [currentProblem, setCurrentProblem] = useState(problem || allProblems[0]);
 
-  // Sidebar state
-  const [showSidebar, setShowSidebar] = useState(true);
+  // Preferred Language persisted in localStorage
+  const [language, setLanguage] = useState(() => {
+    const saved = getStorageItem(PREF_KEYS.PREFERRED_LANGUAGE, "javascript");
+    return SUPPORTED_LANGUAGES.some((l) => l.id === saved) ? saved : "javascript";
+  });
+
+  // Code editor initialization: restore saved in-progress draft or starter code
+  const [code, setCode] = useState(() => {
+    const active = problem || allProblems[0];
+    const initialLang = getStorageItem(PREF_KEYS.PREFERRED_LANGUAGE, "javascript");
+    const draft = getSavedCodeDraft(active?.id, initialLang);
+    if (draft !== null && draft.trim()) return draft;
+    return getProblemStarterSnippet(active, initialLang);
+  });
+
+  // Sidebar state persisted in localStorage
+  const [showSidebar, setShowSidebar] = useState(() => {
+    return getStorageItem(PREF_KEYS.SIDEBAR_OPEN, "true") !== "false";
+  });
   const [sidebarSearch, setSidebarSearch] = useState("");
-  const [sidebarFilter, setSidebarFilter] = useState("ALL"); // ALL | SOLVED | UNSOLVED | Easy | Medium | Hard
+  const [sidebarFilter, setSidebarFilter] = useState("ALL");
 
-  // Problem view tabs: description | approach | solutions
-  const [activeProblemTab, setActiveProblemTab] = useState("description");
+  // Problem view tabs: description | approach | solutions (persisted)
+  const [activeProblemTab, setActiveProblemTab] = useState(() => {
+    const saved = getStorageItem(PREF_KEYS.PROBLEM_TAB, "description");
+    return ["description", "approach", "solutions"].includes(saved) ? saved : "description";
+  });
 
-  // Code editor & language
-  const [language, setLanguage] = useState("javascript");
-  const [code, setCode] = useState(() =>
-    getProblemStarterSnippet(problem || allProblems[0], "javascript")
-  );
+  // Console panel height & state (persisted)
+  const [consoleCollapsed, setConsoleCollapsed] = useState(() => {
+    return getStorageItem(PREF_KEYS.CONSOLE_COLLAPSED, "false") === "true";
+  });
+  const [activeConsoleTab, setActiveConsoleTab] = useState("testcases");
+
+  // Editor font size (persisted)
+  const [fontSize, setFontSize] = useState(() => {
+    const saved = Number(getStorageItem(PREF_KEYS.EDITOR_FONT_SIZE, 13));
+    return saved >= 11 && saved <= 20 ? saved : 13;
+  });
+
+  // Sound effects (persisted)
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    return getStorageItem(PREF_KEYS.SOUND_ENABLED, "true") !== "false";
+  });
+
+  // Testcases & input state
   const [testcases, setTestcases] = useState(() => {
     const p = problem || allProblems[0];
     if (p?.exampleTestcases?.length) return p.exampleTestcases;
@@ -94,15 +138,17 @@ export default function MockPracticeWorkspace({
   const [executionResult, setExecutionResult] = useState(null);
   const [activeResultIndex, setActiveResultIndex] = useState(0);
 
-  // Console panel height & state
-  const [consoleCollapsed, setConsoleCollapsed] = useState(false);
-  const [activeConsoleTab, setActiveConsoleTab] = useState("testcases"); // testcases | result
-
-  // Timer state
-  const [timerSeconds, setTimerSeconds] = useState(45 * 60);
+  // Timer state with persisted preset
+  const [selectedPreset, setSelectedPreset] = useState(() => {
+    const saved = getStorageItem(PREF_KEYS.TIMER_PRESET, "45m");
+    return TIMER_PRESETS.some((p) => p.label === saved) ? saved : "45m";
+  });
+  const [timerSeconds, setTimerSeconds] = useState(() => {
+    const saved = getStorageItem(PREF_KEYS.TIMER_PRESET, "45m");
+    const match = TIMER_PRESETS.find((p) => p.label === saved);
+    return match ? match.seconds : 45 * 60;
+  });
   const [timerRunning, setTimerRunning] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState("45m");
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const timerIntervalRef = useRef(null);
 
   // Full problem details fetched from API if available
@@ -121,6 +167,13 @@ export default function MockPracticeWorkspace({
       handleSwitchProblem(problem);
     }
   }, [problem?.id]);
+
+  // Persist current problem ID to localStorage
+  useEffect(() => {
+    if (currentProblem?.id) {
+      setStorageItem(PREF_KEYS.LAST_PROBLEM_ID, String(currentProblem.id));
+    }
+  }, [currentProblem?.id]);
 
   // Switch to new problem helper
   const handleSwitchProblem = (newProb) => {
@@ -142,9 +195,17 @@ export default function MockPracticeWorkspace({
       setTestcases([""]);
     }
 
-    // Starter code
-    const snippet = getProblemStarterSnippet(newProb, language);
-    setCode(snippet);
+    // Restore saved code draft or starter snippet
+    const draft = getSavedCodeDraft(newProb.id, language);
+    if (draft !== null && draft.trim()) {
+      setCode(draft);
+    } else {
+      const snippet = getProblemStarterSnippet(newProb, language);
+      setCode(snippet);
+    }
+
+    // Persist last opened problem ID
+    setStorageItem(PREF_KEYS.LAST_PROBLEM_ID, String(newProb.id));
 
     if (onSelectProblem) {
       onSelectProblem(newProb);
@@ -164,13 +225,14 @@ export default function MockPracticeWorkspace({
           if (prob?.exampleTestcaseList?.length > 0) {
             setTestcases(prob.exampleTestcaseList);
           }
-          if (prob?.codeSnippets?.length > 0) {
+          // Only update code if candidate hasn't already typed a custom draft
+          const draft = getSavedCodeDraft(currentProblem.id, language);
+          if (!draft && prob?.codeSnippets?.length > 0) {
             const starter = getProblemStarterSnippet(prob, language);
             setCode(starter);
           }
         })
         .catch(() => {
-          // Fallback to local curated problem
           setFullProblem(null);
         })
         .finally(() => {
@@ -180,7 +242,7 @@ export default function MockPracticeWorkspace({
     return () => {
       isMounted = false;
     };
-  }, [currentProblem?.titleSlug]);
+  }, [currentProblem?.titleSlug, language]);
 
   // Personal countdown timer logic
   useEffect(() => {
@@ -216,13 +278,83 @@ export default function MockPracticeWorkspace({
     return `${mins.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  // Language Change Handler
+  // Language Change Handler with LocalStorage persistence & draft retrieval
   const handleLanguageChange = (newLang) => {
     setLanguage(newLang);
-    const activeData = fullProblem || currentProblem;
-    const newSnippet = getProblemStarterSnippet(activeData, newLang);
-    setCode(newSnippet);
-    toast.info(`Language switched to ${SUPPORTED_LANGUAGES.find((l) => l.id === newLang)?.label || newLang}`);
+    setStorageItem(PREF_KEYS.PREFERRED_LANGUAGE, newLang);
+
+    // Retrieve saved draft for this question & language, or fallback to starter snippet
+    const draft = getSavedCodeDraft(currentProblem.id, newLang);
+    if (draft !== null && draft.trim()) {
+      setCode(draft);
+      toast.info(`Switched to ${SUPPORTED_LANGUAGES.find((l) => l.id === newLang)?.label || newLang} (Restored draft)`);
+    } else {
+      const activeData = fullProblem || currentProblem;
+      const newSnippet = getProblemStarterSnippet(activeData, newLang);
+      setCode(newSnippet);
+      toast.info(`Switched to ${SUPPORTED_LANGUAGES.find((l) => l.id === newLang)?.label || newLang}`);
+    }
+  };
+
+  // Code editor change handler: auto-saves candidate code to localStorage
+  const handleCodeChange = (newVal) => {
+    const updated = newVal || "";
+    setCode(updated);
+    if (currentProblem?.id) {
+      saveCodeDraft(currentProblem.id, language, updated);
+    }
+  };
+
+  // Toggle Sidebar with LocalStorage persistence
+  const handleToggleSidebar = () => {
+    setShowSidebar((prev) => {
+      const next = !prev;
+      setStorageItem(PREF_KEYS.SIDEBAR_OPEN, String(next));
+      return next;
+    });
+  };
+
+  // Problem Tab Change with LocalStorage persistence
+  const handleSelectProblemTab = (tab) => {
+    setActiveProblemTab(tab);
+    setStorageItem(PREF_KEYS.PROBLEM_TAB, tab);
+  };
+
+  // Toggle Console with LocalStorage persistence
+  const handleToggleConsole = () => {
+    setConsoleCollapsed((prev) => {
+      const next = !prev;
+      setStorageItem(PREF_KEYS.CONSOLE_COLLAPSED, String(next));
+      return next;
+    });
+  };
+
+  // Sound Toggle with LocalStorage persistence
+  const handleToggleSound = () => {
+    setSoundEnabled((prev) => {
+      const next = !prev;
+      setStorageItem(PREF_KEYS.SOUND_ENABLED, String(next));
+      toast.info(next ? "Audio sounds enabled 🔔" : "Audio muted 🔕");
+      return next;
+    });
+  };
+
+  // Timer Preset Change with LocalStorage persistence
+  const handleSelectTimerPreset = (preset) => {
+    setSelectedPreset(preset.label);
+    setTimerSeconds(preset.seconds);
+    setTimerRunning(false);
+    setStorageItem(PREF_KEYS.TIMER_PRESET, preset.label);
+    toast.info(`Timer set to ${preset.label}`);
+  };
+
+  // Adjust Font Size with LocalStorage persistence
+  const handleAdjustFontSize = (delta) => {
+    setFontSize((prev) => {
+      const next = Math.max(11, Math.min(20, prev + delta));
+      setStorageItem(PREF_KEYS.EDITOR_FONT_SIZE, String(next));
+      return next;
+    });
   };
 
   // Run Code against compiler
@@ -265,7 +397,6 @@ export default function MockPracticeWorkspace({
           onProblemSolved(currentProblem.id);
         }
 
-        // Record submission
         try {
           await apiRequest("/submissions", {
             method: "POST",
@@ -313,14 +444,14 @@ export default function MockPracticeWorkspace({
 
       setAiHint(res.hint || "Review two pointers or boundary edge cases.");
       setHintLevel((prev) => Math.min(prev + 1, 3));
-      setActiveProblemTab("description");
+      handleSelectProblemTab("description");
       toast.success(`Level ${hintLevel} Socratic hint generated! 💡`);
     } catch (err) {
       setAiHint(
         currentProblem?.intuition ||
           "Consider using a Hash Map or Two Pointers to achieve optimal Big-O complexity."
       );
-      setActiveProblemTab("description");
+      handleSelectProblemTab("description");
       toast.info("Generated blueprint hint.");
     } finally {
       setAiLoading(false);
@@ -334,11 +465,13 @@ export default function MockPracticeWorkspace({
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
+  // Reset starter: clears draft and restores starter template
   const handleResetStarter = () => {
-    if (!confirm("Reset editor to original starter template?")) return;
+    if (!confirm("Reset editor to original starter template? This will erase your unsaved draft for this problem.")) return;
+    clearCodeDraft(currentProblem?.id, language);
     const starter = getProblemStarterSnippet(fullProblem || currentProblem, language);
     setCode(starter);
-    toast.info("Editor reset to starter template");
+    toast.info("Draft cleared & editor reset to original template");
   };
 
   // Navigation: Next / Prev problem
@@ -400,7 +533,7 @@ export default function MockPracticeWorkspace({
           </button>
 
           <button
-            onClick={() => setShowSidebar(!showSidebar)}
+            onClick={handleToggleSidebar}
             className={`p-1.5 rounded-xl border transition shrink-0 ${
               showSidebar
                 ? "bg-indigo-600/20 text-indigo-400 border-indigo-500/30"
@@ -456,8 +589,8 @@ export default function MockPracticeWorkspace({
           </div>
         </div>
 
-        {/* Right: Solved Toggle, Language, Timer, AI Hint, Run Code */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {/* Right: Solved Toggle, Preferred Language, Timer, Audio Mute, AI Hint, Run Code */}
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           {/* Quick Solved Status Toggle */}
           <button
             onClick={() => onToggleSolved && onToggleSolved(currentProblem.id)}
@@ -478,8 +611,8 @@ export default function MockPracticeWorkspace({
             </span>
           </button>
 
-          {/* Language Selector */}
-          <div className="flex items-center bg-slate-800 border border-slate-700/80 rounded-xl px-2.5 py-1">
+          {/* Preferred Language Selector (Saved to LocalStorage) */}
+          <div className="flex items-center bg-slate-800 border border-slate-700/80 rounded-xl px-2.5 py-1" title="Preferred Programming Language">
             <select
               value={language}
               onChange={(e) => handleLanguageChange(e.target.value)}
@@ -493,15 +626,15 @@ export default function MockPracticeWorkspace({
             </select>
           </div>
 
-          {/* Mock Interview Countdown Timer */}
-          <div className="hidden sm:flex items-center gap-1.5 bg-slate-800 border border-slate-700/80 rounded-xl px-2.5 py-1">
+          {/* Mock Interview Countdown Timer with Presets */}
+          <div className="hidden sm:flex items-center gap-1 bg-slate-800 border border-slate-700/80 rounded-xl px-2 py-1">
             <Timer
-              className={`w-3.5 h-3.5 ${
+              className={`w-3.5 h-3.5 mr-0.5 ${
                 timerRunning ? "text-amber-400 animate-pulse" : "text-slate-400"
               }`}
             />
             <span
-              className={`font-mono text-xs font-bold ${
+              className={`font-mono text-xs font-bold mr-1 ${
                 timerSeconds < 300
                   ? "text-rose-400"
                   : timerSeconds < 600
@@ -512,9 +645,26 @@ export default function MockPracticeWorkspace({
               {formatTimer(timerSeconds)}
             </span>
 
+            {/* Presets dropdown */}
+            <select
+              value={selectedPreset}
+              onChange={(e) => {
+                const match = TIMER_PRESETS.find((p) => p.label === e.target.value);
+                if (match) handleSelectTimerPreset(match);
+              }}
+              className="bg-transparent text-[10px] text-slate-400 font-mono focus:outline-none cursor-pointer border-l border-slate-700 pl-1"
+              title="Select Timer Preset Duration"
+            >
+              {TIMER_PRESETS.map((p) => (
+                <option key={p.label} value={p.label} className="bg-slate-900 text-slate-200">
+                  {p.label}
+                </option>
+              ))}
+            </select>
+
             <button
               onClick={() => setTimerRunning(!timerRunning)}
-              className="p-1 rounded text-slate-400 hover:text-white transition ml-1"
+              className="p-1 rounded text-slate-400 hover:text-white transition ml-0.5"
               title={timerRunning ? "Pause Timer" : "Start Mock Interview Timer"}
             >
               {timerRunning ? (
@@ -526,15 +676,29 @@ export default function MockPracticeWorkspace({
 
             <button
               onClick={() => {
+                const match = TIMER_PRESETS.find((p) => p.label === selectedPreset);
                 setTimerRunning(false);
-                setTimerSeconds(45 * 60);
+                setTimerSeconds(match ? match.seconds : 45 * 60);
               }}
               className="p-1 rounded text-slate-400 hover:text-slate-200 transition"
-              title="Reset Timer to 45m"
+              title="Reset Timer"
             >
               <RotateCcw className="w-3 h-3" />
             </button>
           </div>
+
+          {/* Sound Toggle Button (Persisted to LocalStorage) */}
+          <button
+            onClick={handleToggleSound}
+            className={`p-1.5 rounded-xl border transition ${
+              soundEnabled
+                ? "bg-slate-800 text-emerald-400 border-slate-700/60 hover:bg-slate-700"
+                : "bg-slate-800 text-slate-500 border-slate-700/60 hover:text-slate-300"
+            }`}
+            title={soundEnabled ? "Mute Mock Interview Audio" : "Unmute Mock Interview Audio"}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
 
           {/* AI Hint Button */}
           <button
@@ -718,7 +882,7 @@ export default function MockPracticeWorkspace({
           <div className="px-4 py-2 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between text-xs shrink-0">
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setActiveProblemTab("description")}
+                onClick={() => handleSelectProblemTab("description")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition ${
                   activeProblemTab === "description"
                     ? "bg-indigo-600 text-white shadow-sm"
@@ -730,7 +894,7 @@ export default function MockPracticeWorkspace({
               </button>
 
               <button
-                onClick={() => setActiveProblemTab("approach")}
+                onClick={() => handleSelectProblemTab("approach")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition ${
                   activeProblemTab === "approach"
                     ? "bg-indigo-600 text-white shadow-sm"
@@ -742,7 +906,7 @@ export default function MockPracticeWorkspace({
               </button>
 
               <button
-                onClick={() => setActiveProblemTab("solutions")}
+                onClick={() => handleSelectProblemTab("solutions")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition ${
                   activeProblemTab === "solutions"
                     ? "bg-indigo-600 text-white shadow-sm"
@@ -952,6 +1116,27 @@ export default function MockPracticeWorkspace({
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Font Size Adjuster (Persisted in LocalStorage) */}
+              <div className="flex items-center gap-0.5 bg-slate-800 border border-slate-700/60 rounded-lg p-0.5" title="Editor Font Size">
+                <button
+                  onClick={() => handleAdjustFontSize(-1)}
+                  disabled={fontSize <= 11}
+                  className="p-1 hover:text-white text-slate-400 disabled:opacity-30 transition rounded"
+                  title="Decrease Font Size"
+                >
+                  <Minus className="w-3 h-3" />
+                </button>
+                <span className="px-1 text-[10px] font-mono text-slate-300 font-semibold">{fontSize}px</span>
+                <button
+                  onClick={() => handleAdjustFontSize(1)}
+                  disabled={fontSize >= 20}
+                  className="p-1 hover:text-white text-slate-400 disabled:opacity-30 transition rounded"
+                  title="Increase Font Size"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </div>
+
               <button
                 onClick={handleCopyCode}
                 className="p-1 text-slate-400 hover:text-white transition rounded"
@@ -963,10 +1148,11 @@ export default function MockPracticeWorkspace({
                   <Copy className="w-3.5 h-3.5" />
                 )}
               </button>
+
               <button
                 onClick={handleResetStarter}
                 className="p-1 text-slate-400 hover:text-white transition rounded"
-                title="Reset to Starter Template"
+                title="Reset to Starter Template (Clears Saved Draft)"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
@@ -980,10 +1166,10 @@ export default function MockPracticeWorkspace({
               language={SUPPORTED_LANGUAGES.find((l) => l.id === language)?.monaco || "javascript"}
               theme="vs-dark"
               value={code}
-              onChange={(newVal) => setCode(newVal || "")}
+              onChange={handleCodeChange}
               options={{
                 minimap: { enabled: false },
-                fontSize: 13,
+                fontSize: fontSize,
                 fontFamily: "var(--font-mono), monospace",
                 lineNumbers: "on",
                 scrollBeyondLastLine: false,
@@ -1004,7 +1190,7 @@ export default function MockPracticeWorkspace({
             <div className="px-3 py-1.5 border-b border-slate-800 flex items-center justify-between text-xs bg-slate-950/80 shrink-0">
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setConsoleCollapsed(!consoleCollapsed)}
+                  onClick={handleToggleConsole}
                   className="flex items-center gap-1 text-slate-400 hover:text-white font-semibold transition"
                   title={consoleCollapsed ? "Expand Console" : "Collapse Console"}
                 >
@@ -1021,7 +1207,7 @@ export default function MockPracticeWorkspace({
                 <button
                   onClick={() => {
                     setActiveConsoleTab("testcases");
-                    if (consoleCollapsed) setConsoleCollapsed(false);
+                    if (consoleCollapsed) handleToggleConsole();
                   }}
                   className={`px-2 py-0.5 rounded text-[11px] font-semibold transition ${
                     activeConsoleTab === "testcases"
@@ -1035,7 +1221,7 @@ export default function MockPracticeWorkspace({
                 <button
                   onClick={() => {
                     setActiveConsoleTab("result");
-                    if (consoleCollapsed) setConsoleCollapsed(false);
+                    if (consoleCollapsed) handleToggleConsole();
                   }}
                   className={`px-2 py-0.5 rounded text-[11px] font-semibold transition flex items-center gap-1 ${
                     activeConsoleTab === "result"
