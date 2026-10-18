@@ -33,6 +33,11 @@ import {
   Eye,
   EyeOff,
   X,
+  Mic,
+  Bot,
+  History,
+  TrendingUp,
+  Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -41,8 +46,15 @@ import {
   BEHAVIORAL_QUESTIONS,
   SYSTEM_DESIGN_TOPICS,
 } from "@/data/interviewPrepData";
+import {
+  MOCK_INTERVIEW_TRACKS,
+  MOCK_TOPICS,
+  MOCK_DIFFICULTIES,
+} from "@/data/mockInterviewTracks";
 import MockPracticeWorkspace from "@/components/MockPracticeWorkspace";
 import SystemDesignPrimer from "@/components/SystemDesignPrimer";
+import AIVoiceInterviewModal from "@/components/AIVoiceInterviewModal";
+import PastInterviewsView from "@/components/PastInterviewsView";
 import {
   PREF_KEYS,
   getStorageItem,
@@ -75,6 +87,13 @@ export default function InterviewPrepPage({ embedded = false }) {
   const [creatingRoom, setCreatingRoom] = useState(false);
   const [selectedPracticeProblem, setSelectedPracticeProblem] = useState(null);
   const [revealedApproachIds, setRevealedApproachIds] = useState([]);
+
+  // 🎙️ AI Voice Mock Interview State
+  const [activeVoiceTrack, setActiveVoiceTrack] = useState(null);
+  const [mockTopicFilter, setMockTopicFilter] = useState("ALL");
+  const [mockDifficultyFilter, setMockDifficultyFilter] = useState("ALL");
+  const [mockSearchQuery, setMockSearchQuery] = useState("");
+  const [mockViewMode, setMockViewMode] = useState("tracks"); // 'tracks' | 'history'
 
   // Load preferences, solved list, and drafts from localStorage
   useEffect(() => {
@@ -328,9 +347,32 @@ export default function InterviewPrepPage({ embedded = false }) {
         />
       )}
 
+      {/* 🎙️ Dedicated Gemini AI Voice Mock Interview Room Modal */}
+      {activeVoiceTrack && (
+        <AIVoiceInterviewModal
+          track={activeVoiceTrack}
+          onClose={() => setActiveVoiceTrack(null)}
+          onInterviewCompleted={() => {
+            // Can switch to history view or let user view their report
+          }}
+        />
+      )}
+
       {/* Navigation Tabs */}
       <div className={`border-b border-slate-800 bg-slate-900/60 sticky ${embedded ? "top-0" : "top-[57px]"} z-20 backdrop-blur-md`}>
         <div className="max-w-7xl mx-auto px-4 flex items-center gap-1.5 sm:gap-2 overflow-x-auto custom-scrollbar py-2.5">
+          <button
+            onClick={() => handleTabChange("ai-voice-mock")}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition shrink-0 ${
+              activeTab === "ai-voice-mock"
+                ? "bg-gradient-to-r from-rose-600 to-indigo-600 text-white shadow-md shadow-indigo-600/25"
+                : "text-slate-300 hover:text-white hover:bg-slate-800/80 bg-slate-800/40 border border-slate-700/40"
+            }`}
+          >
+            <Mic className="w-3.5 h-3.5 text-rose-400" />
+            <span>🎙️ AI Voice Mock Interview</span>
+          </button>
+
           <button
             onClick={() => handleTabChange("dsa")}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shrink-0 ${
@@ -383,6 +425,260 @@ export default function InterviewPrepPage({ embedded = false }) {
 
       {/* Main Content Body */}
       <main className="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
+        {/* ==================================================== */}
+        {/* TAB 0: 🎙️ AI VOICE MOCK INTERVIEWS (GEMINI 3.8 FLASH) */}
+        {/* ==================================================== */}
+        {activeTab === "ai-voice-mock" && (
+          <div className="space-y-6">
+            {/* Header Hero Banner */}
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-indigo-950/60 via-slate-900 to-slate-950 border border-indigo-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+              <div className="space-y-2 z-10 max-w-2xl">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-bold">
+                  <Mic className="w-3.5 h-3.5 animate-pulse" />
+                  <span>Real-Time Voice Technical Interview Simulation</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight">
+                  Voice Call Technical Interviews with Gemini AI
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  Practice verbal explanations, architectural trade-offs, and deep system questions across Frontend, Backend, Fullstack, OOPS, CN, DBMS, System Design, RAG, and OS. Receive an instant FAANG Bar Raiser performance scorecard and study roadmap.
+                </p>
+              </div>
+
+              {/* View Switcher: Tracks Catalog vs Past Performance */}
+              <div className="flex items-center p-1 bg-slate-950/80 border border-slate-800 rounded-2xl shrink-0 z-10">
+                <button
+                  onClick={() => setMockViewMode("tracks")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+                    mockViewMode === "tracks"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                      : "text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  <Bot className="w-3.5 h-3.5" />
+                  <span>Tracks Catalog ({MOCK_INTERVIEW_TRACKS.length})</span>
+                </button>
+                <button
+                  onClick={() => setMockViewMode("history")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+                    mockViewMode === "history"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                      : "text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  <History className="w-3.5 h-3.5" />
+                  <span>Past Performance & Reports</span>
+                </button>
+              </div>
+
+              {/* Subtle background glow */}
+              <div className="absolute -top-12 -right-12 w-64 h-64 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
+            </div>
+
+            {/* SUBVIEW 1: PAST PERFORMANCE & REPORTS */}
+            {mockViewMode === "history" && (
+              <PastInterviewsView onSelectTrackToPractice={() => setMockViewMode("tracks")} />
+            )}
+
+            {/* SUBVIEW 2: MOCK TRACKS DIRECTORY */}
+            {mockViewMode === "tracks" && (
+              <div className="space-y-6">
+                {/* Search & Topic Filters Bar */}
+                <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
+                  {/* Row 1: Search + Difficulty Filter */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div className="relative flex-1">
+                      <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={mockSearchQuery}
+                        onChange={(e) => setMockSearchQuery(e.target.value)}
+                        placeholder="Search interview topics (e.g. React, Kafka, B+ Tree, RAG, WebSockets)..."
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-9 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                      />
+                      {mockSearchQuery && (
+                        <button
+                          onClick={() => setMockSearchQuery("")}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-400 font-medium whitespace-nowrap">Difficulty:</span>
+                      <select
+                        value={mockDifficultyFilter}
+                        onChange={(e) => setMockDifficultyFilter(e.target.value)}
+                        className="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                      >
+                        {MOCK_DIFFICULTIES.map((d) => (
+                          <option key={d} value={d}>
+                            {d === "ALL" ? "All Levels" : d}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Row 2: Topic Pills */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-slate-800/60">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mr-1">
+                      Topics:
+                    </span>
+                    {MOCK_TOPICS.map((topic) => {
+                      const count =
+                        topic === "ALL"
+                          ? MOCK_INTERVIEW_TRACKS.length
+                          : MOCK_INTERVIEW_TRACKS.filter((t) => t.topic === topic).length;
+                      const isActive = mockTopicFilter === topic;
+                      return (
+                        <button
+                          key={topic}
+                          onClick={() => setMockTopicFilter(topic)}
+                          className={`px-3 py-1 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+                            isActive
+                              ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/30"
+                              : "bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800/80"
+                          }`}
+                        >
+                          <span>{topic === "ALL" ? "All Topics" : topic}</span>
+                          <span
+                            className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                              isActive ? "bg-indigo-500 text-white" : "bg-slate-800 text-slate-400"
+                            }`}
+                          >
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Tracks Grid */}
+                {(() => {
+                  const filtered = MOCK_INTERVIEW_TRACKS.filter((track) => {
+                    const matchesTopic = mockTopicFilter === "ALL" || track.topic === mockTopicFilter;
+                    const matchesDiff =
+                      mockDifficultyFilter === "ALL" || track.difficulty === mockDifficultyFilter;
+                    const matchesSearch =
+                      !mockSearchQuery.trim() ||
+                      track.title.toLowerCase().includes(mockSearchQuery.toLowerCase()) ||
+                      track.topic.toLowerCase().includes(mockSearchQuery.toLowerCase()) ||
+                      track.description.toLowerCase().includes(mockSearchQuery.toLowerCase());
+                    return matchesTopic && matchesDiff && matchesSearch;
+                  });
+
+                  if (filtered.length === 0) {
+                    return (
+                      <div className="py-12 text-center rounded-3xl bg-slate-900/40 border border-slate-800 text-slate-400 text-xs space-y-2">
+                        <p>No mock interview tracks match your active filters.</p>
+                        <button
+                          onClick={() => {
+                            setMockTopicFilter("ALL");
+                            setMockDifficultyFilter("ALL");
+                            setMockSearchQuery("");
+                          }}
+                          className="text-indigo-400 hover:underline font-semibold"
+                        >
+                          Clear all filters
+                        </button>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filtered.map((track) => {
+                        const getTopicBadge = (topic) => {
+                          const map = {
+                            Frontend: "bg-indigo-500/10 text-indigo-400 border-indigo-500/30",
+                            Backend: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+                            Fullstack: "bg-purple-500/10 text-purple-400 border-purple-500/30",
+                            OOPS: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+                            CN: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
+                            DBMS: "bg-rose-500/10 text-rose-400 border-rose-500/30",
+                            "System Design": "bg-orange-500/10 text-orange-400 border-orange-500/30",
+                            RAG: "bg-pink-500/10 text-pink-400 border-pink-500/30",
+                            OS: "bg-teal-500/10 text-teal-400 border-teal-500/30",
+                          };
+                          return map[topic] || "bg-slate-800 text-slate-300 border-slate-700";
+                        };
+
+                        return (
+                          <div
+                            key={track.id}
+                            className="p-5 rounded-3xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-slate-700/80 transition flex flex-col justify-between space-y-4 shadow-sm group"
+                          >
+                            <div className="space-y-3">
+                              {/* Badges */}
+                              <div className="flex items-center justify-between gap-2">
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getTopicBadge(track.topic)}`}>
+                                  {track.topic}
+                                </span>
+                                <div className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
+                                  <span className="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700/60">
+                                    {track.difficulty}
+                                  </span>
+                                  <span className="text-slate-500">•</span>
+                                  <span>{track.estimatedMinutes} min</span>
+                                </div>
+                              </div>
+
+                              {/* Title & Description */}
+                              <div>
+                                <h3 className="text-sm font-bold text-slate-100 group-hover:text-indigo-300 transition line-clamp-1">
+                                  {track.title}
+                                </h3>
+                                <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                                  {track.description}
+                                </p>
+                              </div>
+
+                              {/* Key Focus Areas */}
+                              <div className="space-y-1.5 pt-1">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                                  Key Focus Areas:
+                                </span>
+                                <div className="flex flex-wrap gap-1">
+                                  {track.focusAreas.slice(0, 3).map((f, i) => (
+                                    <span
+                                      key={i}
+                                      className="px-2 py-0.5 rounded-lg bg-slate-950 text-[10px] text-slate-300 border border-slate-800/80 truncate max-w-full"
+                                    >
+                                      {f}
+                                    </span>
+                                  ))}
+                                  {track.focusAreas.length > 3 && (
+                                    <span className="px-1.5 py-0.5 rounded-lg bg-slate-950 text-[10px] text-slate-500">
+                                      +{track.focusAreas.length - 3} more
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Start Voice Interview Action */}
+                            <button
+                              onClick={() => setActiveVoiceTrack(track)}
+                              className="w-full py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20 transition group-hover:scale-[1.02]"
+                            >
+                              <Mic className="w-3.5 h-3.5 text-rose-300" />
+                              <span>Give Voice Call Interview</span>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ==================================================== */}
         {/* TAB 1: DSA CODING PATTERNS & HIGH-FREQUENCY PROBLEMS */}
         {/* ==================================================== */}
