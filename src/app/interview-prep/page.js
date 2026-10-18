@@ -32,6 +32,7 @@ import {
   Compass,
   Eye,
   EyeOff,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -64,6 +65,7 @@ export default function InterviewPrepPage({ embedded = false }) {
   const [selectedDifficulty, setSelectedDifficulty] = useState(() => {
     return getStorageItem(PREF_KEYS.PREP_DIFF_FILTER, "ALL");
   });
+  const [statusFilter, setStatusFilter] = useState("ALL"); // 'ALL' | 'SOLVED' | 'UNSOLVED'
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedProblemId, setExpandedProblemId] = useState(null);
   const [solvedList, setSolvedList] = useState([]);
@@ -127,23 +129,51 @@ export default function InterviewPrepPage({ embedded = false }) {
     setStorageItem(PREF_KEYS.PREP_PATTERN_FILTER, pat);
   };
 
+  // Canonical ordering for patterns
+  const CANONICAL_PATTERN_ORDER = [
+    "Arrays & Hashing",
+    "Two Pointers",
+    "Sliding Window",
+    "Stack",
+    "Binary Search",
+    "Linked List",
+    "Trees",
+    "Tries",
+    "Heap & Priority Queue",
+    "Dynamic Programming",
+    "Graphs",
+    "Matrix",
+    "Intervals",
+    "Bit Manipulation",
+    "Backtracking",
+    "Greedy",
+  ];
+
+  // Unique patterns list ordered logically
+  const patternsList = [
+    "ALL",
+    ...CANONICAL_PATTERN_ORDER.filter((pat) =>
+      CURATED_PROBLEMS.some((p) => p.pattern === pat)
+    ),
+  ];
+
   // Filter problems
   const filteredProblems = CURATED_PROBLEMS.filter((p) => {
     if (selectedPattern !== "ALL" && p.pattern !== selectedPattern) return false;
     if (selectedDifficulty !== "ALL" && p.difficulty !== selectedDifficulty) return false;
+    if (statusFilter === "SOLVED" && !solvedList.includes(p.id)) return false;
+    if (statusFilter === "UNSOLVED" && solvedList.includes(p.id)) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       return (
         p.title.toLowerCase().includes(q) ||
+        String(p.frontendId).includes(q) ||
         p.pattern.toLowerCase().includes(q) ||
         p.companies.some((c) => c.toLowerCase().includes(q))
       );
     }
     return true;
   });
-
-  // Unique patterns list
-  const patternsList = ["ALL", ...new Set(CURATED_PROBLEMS.map((p) => p.pattern))];
 
   // Quick Action: Launch Personal Solo Mock Interview Practice
   const handleStartSoloPractice = (problem) => {
@@ -358,51 +388,137 @@ export default function InterviewPrepPage({ embedded = false }) {
         {/* ==================================================== */}
         {activeTab === "dsa" && (
           <div className="space-y-6">
-            {/* Filter & Search Bar - Fully Responsive */}
-            <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between bg-slate-900/60 border border-slate-800 p-3 sm:p-3.5 rounded-2xl">
-              {/* Pattern Filter Chips */}
-              <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-2 lg:pb-0 shrink-0">
-                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
-                  <Filter className="w-3 h-3" />
-                  Pattern:
-                </span>
-                {patternsList.map((pat) => (
-                  <button
-                    key={pat}
-                    onClick={() => handlePatternChange(pat)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition border shrink-0 ${
-                      selectedPattern === pat
-                        ? "bg-indigo-600 text-white border-indigo-500"
-                        : "bg-slate-800/80 text-slate-400 border-slate-700/60 hover:text-slate-200"
-                    }`}
-                  >
-                    {pat}
-                  </button>
-                ))}
-              </div>
-
-              {/* Right: Difficulty & Search */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
-                <select
-                  value={selectedDifficulty}
-                  onChange={(e) => handleDifficultyChange(e.target.value)}
-                  className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 shrink-0"
-                >
-                  <option value="ALL">All Difficulties</option>
-                  <option value="Easy">Easy</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Hard">Hard</option>
-                </select>
-
-                <div className="relative flex-1 sm:w-64">
-                  <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+            {/* Filter & Search Bar - Fully Responsive, Clean Wrapped Topic Pills, Zero Overflow */}
+            <div className="bg-slate-900/70 border border-slate-800 p-3.5 sm:p-4 rounded-2xl space-y-3.5 shadow-sm">
+              {/* Row 1: Search + Quick Dropdowns + Reset */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                {/* Search Bar */}
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search problem or company..."
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    placeholder="Search problem, company, or #id..."
+                    className="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-8 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
                   />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-slate-500 hover:text-slate-300 transition"
+                      title="Clear search"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Dropdowns Group */}
+                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                  {/* Pattern Dropdown */}
+                  <div className="min-w-[130px] flex-1 sm:flex-none">
+                    <select
+                      value={selectedPattern}
+                      onChange={(e) => handlePatternChange(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                      title="Filter by Topic / Pattern"
+                    >
+                      <option value="ALL">All Topics ({CURATED_PROBLEMS.length})</option>
+                      {patternsList.filter((p) => p !== "ALL").map((pat) => (
+                        <option key={pat} value={pat}>
+                          {pat} ({CURATED_PROBLEMS.filter((p) => p.pattern === pat).length})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Difficulty Dropdown */}
+                  <div className="min-w-[120px] flex-1 sm:flex-none">
+                    <select
+                      value={selectedDifficulty}
+                      onChange={(e) => handleDifficultyChange(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                    >
+                      <option value="ALL">All Difficulties</option>
+                      <option value="Easy">Easy ({CURATED_PROBLEMS.filter((p) => p.difficulty === "Easy").length})</option>
+                      <option value="Medium">Medium ({CURATED_PROBLEMS.filter((p) => p.difficulty === "Medium").length})</option>
+                      <option value="Hard">Hard ({CURATED_PROBLEMS.filter((p) => p.difficulty === "Hard").length})</option>
+                    </select>
+                  </div>
+
+                  {/* Status Dropdown */}
+                  <div className="min-w-[110px] flex-1 sm:flex-none">
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                    >
+                      <option value="ALL">All Status</option>
+                      <option value="SOLVED">Solved ({solvedCount})</option>
+                      <option value="UNSOLVED">Unsolved ({CURATED_PROBLEMS.length - solvedCount})</option>
+                    </select>
+                  </div>
+
+                  {/* Reset Filters */}
+                  {(selectedPattern !== "ALL" || selectedDifficulty !== "ALL" || statusFilter !== "ALL" || searchQuery.trim()) && (
+                    <button
+                      onClick={() => {
+                        handlePatternChange("ALL");
+                        handleDifficultyChange("ALL");
+                        setStatusFilter("ALL");
+                        setSearchQuery("");
+                      }}
+                      className="px-2.5 py-2 text-xs text-indigo-400 hover:text-indigo-300 font-medium whitespace-nowrap transition bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 rounded-xl"
+                      title="Reset all filters"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Row 2: Wrapped Topic / Pattern Filter Pills (Never overflows) */}
+              <div className="pt-2.5 border-t border-slate-800/80">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Filter className="w-3 h-3 text-indigo-400" />
+                    <span>Filter by Topic / Pattern:</span>
+                  </span>
+                  <span className="text-[11px] text-slate-500 font-mono">
+                    Showing {filteredProblems.length} of {CURATED_PROBLEMS.length}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5 w-full">
+                  {patternsList.map((pat) => {
+                    const count =
+                      pat === "ALL"
+                        ? CURATED_PROBLEMS.length
+                        : CURATED_PROBLEMS.filter((p) => p.pattern === pat).length;
+                    const isSelected = selectedPattern === pat;
+                    return (
+                      <button
+                        key={pat}
+                        onClick={() => handlePatternChange(pat)}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium transition border ${
+                          isSelected
+                            ? "bg-indigo-600 text-white border-indigo-500 shadow-sm"
+                            : "bg-slate-950/70 hover:bg-slate-800 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white"
+                        }`}
+                      >
+                        <span>{pat}</span>
+                        <span
+                          className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                            isSelected
+                              ? "bg-indigo-700 text-indigo-100"
+                              : "bg-slate-800 text-slate-400"
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
