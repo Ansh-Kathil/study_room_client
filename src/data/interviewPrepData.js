@@ -1017,6 +1017,747 @@ public:
     intuition: "XOR all numbers together: a ^ a = 0 and a ^ 0 = a. Duplicate numbers cancel each other out, leaving only the unique number.",
     pitfalls: "Using a hash set which consumes O(N) memory violating the constant space constraint.",
   },
+,
+  {
+    id: 53,
+    frontendId: 53,
+    title: "Maximum Subarray",
+    titleSlug: "maximum-subarray",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "98%",
+    companies: ["Amazon","Microsoft","Apple","Google"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Kadane's Algorithm: Maintain current_sum = max(num, current_sum + num) and update max_sum. Reset running sum whenever it drops below zero.",
+    pitfalls: "All negative numbers: Initializing max_sum to 0 instead of -Infinity or nums[0] will fail.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function maxSubArray(nums) {\n  let currentSum = nums[0];\n  let maxSum = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    currentSum = Math.max(nums[i], currentSum + nums[i]);\n    maxSum = Math.max(maxSum, currentSum);\n  }\n  return maxSum;\n}"
+    },
+    {
+        "lang": "Python",
+        "langSlug": "python3",
+        "code": "class Solution:\n    def maxSubArray(self, nums: list[int]) -> int:\n        cur_sum = max_sum = nums[0]\n        for x in nums[1:]:\n            cur_sum = max(x, cur_sum + x)\n            max_sum = max(max_sum, cur_sum)\n        return max_sum"
+    }
+]
+  },
+  {
+    id: 152,
+    frontendId: 152,
+    title: "Maximum Product Subarray",
+    titleSlug: "maximum-product-subarray",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "90%",
+    companies: ["Amazon","Google","LinkedIn"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Track both maximum and minimum product at each step because multiplying a negative number by a minimum negative product produces a new maximum.",
+    pitfalls: "Forgetting to store current max before updating when calculating min product.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function maxProduct(nums) {\n  let maxProd = nums[0], minProd = nums[0], res = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    if (nums[i] < 0) [maxProd, minProd] = [minProd, maxProd];\n    maxProd = Math.max(nums[i], maxProd * nums[i]);\n    minProd = Math.min(nums[i], minProd * nums[i]);\n    res = Math.max(res, maxProd);\n  }\n  return res;\n}"
+    }
+]
+  },
+  {
+    id: 153,
+    frontendId: 153,
+    title: "Find Minimum in Rotated Sorted Array",
+    titleSlug: "find-minimum-in-rotated-sorted-array",
+    difficulty: "Medium",
+    pattern: "Binary Search",
+    frequency: "92%",
+    companies: ["Microsoft","Amazon","Facebook"],
+    timeComp: "O(log N)",
+    spaceComp: "O(1)",
+    intuition: "Compare mid with right. If nums[mid] > nums[right], the inflection point and minimum are in the right half (left = mid + 1). Otherwise, right = mid.",
+    pitfalls: "Using right = mid - 1 may eliminate the minimum itself when nums[mid] < nums[right].",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function findMin(nums) {\n  let left = 0, right = nums.length - 1;\n  while (left < right) {\n    const mid = Math.floor((left + right) / 2);\n    if (nums[mid] > nums[right]) left = mid + 1;\n    else right = mid;\n  }\n  return nums[left];\n}"
+    }
+]
+  },
+  {
+    id: 371,
+    frontendId: 371,
+    title: "Sum of Two Integers",
+    titleSlug: "sum-of-two-integers",
+    difficulty: "Medium",
+    pattern: "Bit Manipulation",
+    frequency: "85%",
+    companies: ["Facebook","Google"],
+    timeComp: "O(1)",
+    spaceComp: "O(1)",
+    intuition: "XOR (a ^ b) yields the sum without carry. AND shifted left ((a & b) << 1) produces the carry. Repeat until carry is zero.",
+    pitfalls: "In Python/JavaScript, handling 32-bit signed integers and negative numbers with mask 0xFFFFFFFF.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function getSum(a, b) {\n  while (b !== 0) {\n    const carry = (a & b) << 1;\n    a = a ^ b;\n    b = carry;\n  }\n  return a;\n}"
+    }
+]
+  },
+  {
+    id: 338,
+    frontendId: 338,
+    title: "Counting Bits",
+    titleSlug: "counting-bits",
+    difficulty: "Easy",
+    pattern: "Bit Manipulation",
+    frequency: "88%",
+    companies: ["Amazon","Apple"],
+    timeComp: "O(N)",
+    spaceComp: "O(N)",
+    intuition: "DP recurrence: dp[i] = dp[i >> 1] + (i & 1). The number of 1 bits in i is the count in i/2 plus 1 if i is odd.",
+    pitfalls: "Calculating bit counts naively for each number takes O(N log N) instead of linear O(N).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function countBits(n) {\n  const ans = new Array(n + 1).fill(0);\n  for (let i = 1; i <= n; i++) {\n    ans[i] = ans[i >> 1] + (i & 1);\n  }\n  return ans;\n}"
+    }
+]
+  },
+  {
+    id: 268,
+    frontendId: 268,
+    title: "Missing Number",
+    titleSlug: "missing-number",
+    difficulty: "Easy",
+    pattern: "Bit Manipulation",
+    frequency: "95%",
+    companies: ["Amazon","Microsoft","Meta"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "XOR index 0..n with all numbers in array, or use Gauss formula: expected = n*(n+1)/2 minus sum of nums.",
+    pitfalls: "Integer overflow in Gauss formula if numbers are extremely large (though within 32-bit for LeetCode).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function missingNumber(nums) {\n  let res = nums.length;\n  for (let i = 0; i < nums.length; i++) {\n    res ^= i ^ nums[i];\n  }\n  return res;\n}"
+    }
+]
+  },
+  {
+    id: 190,
+    frontendId: 190,
+    title: "Reverse Bits",
+    titleSlug: "reverse-bits",
+    difficulty: "Easy",
+    pattern: "Bit Manipulation",
+    frequency: "82%",
+    companies: ["Apple","Airbnb"],
+    timeComp: "O(1)",
+    spaceComp: "O(1)",
+    intuition: "Loop 32 times: shift res left by 1, add (n & 1), and right-shift n by 1.",
+    pitfalls: "JavaScript bitwise operators convert operands to 32-bit signed ints; use >>> 0 to treat result as unsigned.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function reverseBits(n) {\n  let res = 0;\n  for (let i = 0; i < 32; i++) {\n    res = (res << 1) | (n & 1);\n    n >>>= 1;\n  }\n  return res >>> 0;\n}"
+    }
+]
+  },
+  {
+    id: 1143,
+    frontendId: 1143,
+    title: "Longest Common Subsequence",
+    titleSlug: "longest-common-subsequence",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "94%",
+    companies: ["Amazon","Google","Meta"],
+    timeComp: "O(M * N)",
+    spaceComp: "O(M * N)",
+    intuition: "2D DP grid: If text1[i] == text2[j], dp[i][j] = 1 + dp[i-1][j-1]. Otherwise, dp[i][j] = max(dp[i-1][j], dp[i][j-1]).",
+    pitfalls: "Confusing common substring (contiguous) with common subsequence (non-contiguous).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function longestCommonSubsequence(text1, text2) {\n  const m = text1.length, n = text2.length;\n  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n  for (let i = 1; i <= m; i++) {\n    for (let j = 1; j <= n; j++) {\n      if (text1[i - 1] === text2[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n      else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n    }\n  }\n  return dp[m][n];\n}"
+    }
+]
+  },
+  {
+    id: 139,
+    frontendId: 139,
+    title: "Word Break",
+    titleSlug: "word-break",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "92%",
+    companies: ["Facebook","Amazon","Bloomberg"],
+    timeComp: "O(N^2 * M)",
+    spaceComp: "O(N)",
+    intuition: "dp[i] is true if s[0...i] can be segmented into dictionary words. Check every split j < i where dp[j] is true and s[j...i] is in wordSet.",
+    pitfalls: "Re-scanning wordDict as an array instead of converting to Set for O(1) lookup.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function wordBreak(s, wordDict) {\n  const wordSet = new Set(wordDict);\n  const dp = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (dp[j] && wordSet.has(s.substring(j, i))) {\n        dp[i] = true;\n        break;\n      }\n    }\n  }\n  return dp[s.length];\n}"
+    }
+]
+  },
+  {
+    id: 377,
+    frontendId: 377,
+    title: "Combination Sum IV",
+    titleSlug: "combination-sum-iv",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "84%",
+    companies: ["Google","Facebook"],
+    timeComp: "O(target * N)",
+    spaceComp: "O(target)",
+    intuition: "Permutations of coin change: dp[i] is number of combinations that add to i. dp[i] += dp[i - num] for num in nums if i >= num.",
+    pitfalls: "Order matters here (unlike Coin Change II combinations). The outer loop must iterate targets and inner loop iterate nums.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function combinationSum4(nums, target) {\n  const dp = new Array(target + 1).fill(0);\n  dp[0] = 1;\n  for (let i = 1; i <= target; i++) {\n    for (const num of nums) {\n      if (i >= num) dp[i] += dp[i - num];\n    }\n  }\n  return dp[target];\n}"
+    }
+]
+  },
+  {
+    id: 198,
+    frontendId: 198,
+    title: "House Robber",
+    titleSlug: "house-robber",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "95%",
+    companies: ["Amazon","Google","Microsoft"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "At each house i, rob1 = max loot ending at i-2, rob2 = max loot ending at i-1. New loot = max(rob1 + nums[i], rob2).",
+    pitfalls: "Allocating an O(N) array when only previous 2 values rob1 and rob2 are needed.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function rob(nums) {\n  let rob1 = 0, rob2 = 0;\n  for (const n of nums) {\n    const temp = Math.max(n + rob1, rob2);\n    rob1 = rob2;\n    rob2 = temp;\n  }\n  return rob2;\n}"
+    }
+]
+  },
+  {
+    id: 213,
+    frontendId: 213,
+    title: "House Robber II",
+    titleSlug: "house-robber-ii",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "90%",
+    companies: ["Microsoft","Google"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Since houses are in a circle, either rob houses 0 to n-2 OR rob houses 1 to n-1. Take the max of both runs.",
+    pitfalls: "Edge case with only 1 house: must return nums[0] immediately.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function rob(nums) {\n  if (nums.length === 1) return nums[0];\n  const helper = (arr) => {\n    let r1 = 0, r2 = 0;\n    for (const n of arr) {\n      const temp = Math.max(n + r1, r2);\n      r1 = r2;\n      r2 = temp;\n    }\n    return r2;\n  };\n  return Math.max(helper(nums.slice(0, -1)), helper(nums.slice(1)));\n}"
+    }
+]
+  },
+  {
+    id: 91,
+    frontendId: 91,
+    title: "Decode Ways",
+    titleSlug: "decode-ways",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "93%",
+    companies: ["Facebook","Uber","Google"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "dp[i] represents valid decodings up to index i. Single digit s[i] != '0' contributes dp[i-1]. Two digits s[i-1..i] between 10 and 26 contribute dp[i-2].",
+    pitfalls: "Leading zeros ('06' is invalid) and strings starting with '0'.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function numDecodings(s) {\n  if (!s || s[0] === '0') return 0;\n  let prev2 = 1, prev1 = 1;\n  for (let i = 1; i < s.length; i++) {\n    let cur = 0;\n    const one = parseInt(s[i], 10);\n    const two = parseInt(s.substring(i - 1, i + 1), 10);\n    if (one >= 1 && one <= 9) cur += prev1;\n    if (two >= 10 && two <= 26) cur += prev2;\n    prev2 = prev1;\n    prev1 = cur;\n  }\n  return prev1;\n}"
+    }
+]
+  },
+  {
+    id: 62,
+    frontendId: 62,
+    title: "Unique Paths",
+    titleSlug: "unique-paths",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "92%",
+    companies: ["Amazon","Google","Adobe"],
+    timeComp: "O(M * N)",
+    spaceComp: "O(N)",
+    intuition: "Robot can only move down or right: dp[r][c] = dp[r-1][c] + dp[r][c-1]. Optimize to 1D row array.",
+    pitfalls: "Grid bounds off-by-one errors; initial base case is dp[c] = 1 for all columns in the top row.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function uniquePaths(m, n) {\n  const row = new Array(n).fill(1);\n  for (let i = 1; i < m; i++) {\n    for (let j = 1; j < n; j++) {\n      row[j] += row[j - 1];\n    }\n  }\n  return row[n - 1];\n}"
+    }
+]
+  },
+  {
+    id: 55,
+    frontendId: 55,
+    title: "Jump Game",
+    titleSlug: "jump-game",
+    difficulty: "Medium",
+    pattern: "Greedy",
+    frequency: "94%",
+    companies: ["Amazon","Meta","Microsoft"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Work backwards from the end: goal = n - 1. If i + nums[i] >= goal, update goal = i. If goal == 0 at the end, true.",
+    pitfalls: "Using exponential or quadratic DP when a single backwards greedy scan solves it in O(N).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function canJump(nums) {\n  let goal = nums.length - 1;\n  for (let i = nums.length - 2; i >= 0; i--) {\n    if (i + nums[i] >= goal) goal = i;\n  }\n  return goal === 0;\n}"
+    }
+]
+  },
+  {
+    id: 417,
+    frontendId: 417,
+    title: "Pacific Atlantic Water Flow",
+    titleSlug: "pacific-atlantic-water-flow",
+    difficulty: "Medium",
+    pattern: "Graphs",
+    frequency: "88%",
+    companies: ["Google","Amazon"],
+    timeComp: "O(M * N)",
+    spaceComp: "O(M * N)",
+    intuition: "Instead of flowing water down from each cell, flow water uphill from Pacific ocean borders and Atlantic borders using BFS/DFS. Return intersection of reachable sets.",
+    pitfalls: "Re-running DFS from every cell causes TLE. Reverse thinking from ocean edges is required.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function pacificAtlantic(heights) {\n  const m = heights.length, n = heights[0].length;\n  const pac = Array.from({ length: m }, () => new Array(n).fill(false));\n  const atl = Array.from({ length: m }, () => new Array(n).fill(false));\n  const dfs = (r, c, visit, prev) => {\n    if (r < 0 || c < 0 || r >= m || c >= n || visit[r][c] || heights[r][c] < prev) return;\n    visit[r][c] = true;\n    dfs(r + 1, c, visit, heights[r][c]);\n    dfs(r - 1, c, visit, heights[r][c]);\n    dfs(r, c + 1, visit, heights[r][c]);\n    dfs(r, c - 1, visit, heights[r][c]);\n  };\n  for (let i = 0; i < m; i++) {\n    dfs(i, 0, pac, heights[i][0]);\n    dfs(i, n - 1, atl, heights[i][n - 1]);\n  }\n  for (let j = 0; j < n; j++) {\n    dfs(0, j, pac, heights[0][j]);\n    dfs(m - 1, j, atl, heights[m - 1][j]);\n  }\n  const res = [];\n  for (let i = 0; i < m; i++) {\n    for (let j = 0; j < n; j++) {\n      if (pac[i][j] && atl[i][j]) res.push([i, j]);\n    }\n  }\n  return res;\n}"
+    }
+]
+  },
+  {
+    id: 269,
+    frontendId: 269,
+    title: "Alien Dictionary",
+    titleSlug: "alien-dictionary",
+    difficulty: "Hard",
+    pattern: "Graphs",
+    frequency: "85%",
+    companies: ["Facebook","Airbnb","Pinterest"],
+    timeComp: "O(C)",
+    spaceComp: "O(1) (26 letters)",
+    intuition: "Build a DAG by comparing adjacent words to find lexicographical ordering: character differing first gives directed edge u -> v. Run Topological Sort (Kahn's or DFS).",
+    pitfalls: "Prefix invalid case: word1 is longer than word2 and word2 is a prefix of word1 (e.g. ['abc', 'ab']), which is illegal. Cycle in graph = impossible.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function alienOrder(words) {\n  const adj = new Map();\n  const inDegree = new Map();\n  for (const word of words) {\n    for (const c of word) {\n      if (!adj.has(c)) adj.set(c, new Set());\n      if (!inDegree.has(c)) inDegree.set(c, 0);\n    }\n  }\n  for (let i = 0; i < words.length - 1; i++) {\n    const w1 = words[i], w2 = words[i + 1];\n    const minLen = Math.min(w1.length, w2.length);\n    if (w1.length > w2.length && w1.startsWith(w2)) return \"\";\n    for (let j = 0; j < minLen; j++) {\n      if (w1[j] !== w2[j]) {\n        if (!adj.get(w1[j]).has(w2[j])) {\n          adj.get(w1[j]).add(w2[j]);\n          inDegree.set(w2[j], inDegree.get(w2[j]) + 1);\n        }\n        break;\n      }\n    }\n  }\n  const queue = [];\n  for (const [c, deg] of inDegree.entries()) {\n    if (deg === 0) queue.push(c);\n  }\n  let res = \"\";\n  while (queue.length > 0) {\n    const u = queue.shift();\n    res += u;\n    for (const v of adj.get(u)) {\n      inDegree.set(v, inDegree.get(v) - 1);\n      if (inDegree.get(v) === 0) queue.push(v);\n    }\n  }\n  return res.length === inDegree.size ? res : \"\";\n}"
+    }
+]
+  },
+  {
+    id: 261,
+    frontendId: 261,
+    title: "Graph Valid Tree",
+    titleSlug: "graph-valid-tree",
+    difficulty: "Medium",
+    pattern: "Graphs",
+    frequency: "86%",
+    companies: ["Google","Facebook"],
+    timeComp: "O(V + E)",
+    spaceComp: "O(V + E)",
+    intuition: "A graph is a valid tree iff it has exactly n - 1 edges and is fully connected (no cycles). Check with Union-Find or BFS.",
+    pitfalls: "If edges.length !== n - 1, it cannot be a tree (either has cycles or is disconnected).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function validTree(n, edges) {\n  if (edges.length !== n - 1) return false;\n  const parent = Array.from({ length: n }, (_, i) => i);\n  const find = (i) => parent[i] === i ? i : (parent[i] = find(parent[i]));\n  for (const [u, v] of edges) {\n    const rootU = find(u), rootV = find(v);\n    if (rootU === rootV) return false;\n    parent[rootU] = rootV;\n  }\n  return true;\n}"
+    }
+]
+  },
+  {
+    id: 323,
+    frontendId: 323,
+    title: "Number of Connected Components in an Undirected Graph",
+    titleSlug: "number-of-connected-components-in-an-undirected-graph",
+    difficulty: "Medium",
+    pattern: "Graphs",
+    frequency: "84%",
+    companies: ["Amazon","Twitter","Google"],
+    timeComp: "O(V + E)",
+    spaceComp: "O(V)",
+    intuition: "Start with n components. Use Disjoint Set Union (DSU): whenever an edge successfully merges two disjoint sets, decrement components count by 1.",
+    pitfalls: "Not flattening trees via path compression can lead to degraded DSU runtime.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function countComponents(n, edges) {\n  const parent = Array.from({ length: n }, (_, i) => i);\n  let count = n;\n  const find = (i) => parent[i] === i ? i : (parent[i] = find(parent[i]));\n  for (const [u, v] of edges) {\n    const r1 = find(u), r2 = find(v);\n    if (r1 !== r2) {\n      parent[r1] = r2;\n      count--;\n    }\n  }\n  return count;\n}"
+    }
+]
+  },
+  {
+    id: 252,
+    frontendId: 252,
+    title: "Meeting Rooms",
+    titleSlug: "meeting-rooms",
+    difficulty: "Easy",
+    pattern: "Intervals",
+    frequency: "90%",
+    companies: ["Facebook","Amazon","Google"],
+    timeComp: "O(N log N)",
+    spaceComp: "O(1)",
+    intuition: "Sort meetings by start time. If intervals[i][0] < intervals[i - 1][1], there is an overlap so a person cannot attend all meetings.",
+    pitfalls: "Touching endpoints (e.g. [0, 30] and [30, 40]) do not overlap.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function canAttendMeetings(intervals) {\n  intervals.sort((a, b) => a[0] - b[0]);\n  for (let i = 1; i < intervals.length; i++) {\n    if (intervals[i][0] < intervals[i - 1][1]) return false;\n  }\n  return true;\n}"
+    }
+]
+  },
+  {
+    id: 253,
+    frontendId: 253,
+    title: "Meeting Rooms II",
+    titleSlug: "meeting-rooms-ii",
+    difficulty: "Medium",
+    pattern: "Intervals",
+    frequency: "96%",
+    companies: ["Amazon","Bloomberg","Google","Facebook"],
+    timeComp: "O(N log N)",
+    spaceComp: "O(N)",
+    intuition: "Chronological Ordering: Extract all start and end times into two sorted arrays. Iterate starts: if start < end, need new room. Else reuse room and advance end pointer.",
+    pitfalls: "Attempting brute force O(N^2) interval comparisons instead of two-pointer sweep-line.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function minMeetingRooms(intervals) {\n  const starts = intervals.map(i => i[0]).sort((a, b) => a - b);\n  const ends = intervals.map(i => i[1]).sort((a, b) => a - b);\n  let rooms = 0, endIdx = 0;\n  for (let i = 0; i < starts.length; i++) {\n    if (starts[i] < ends[endIdx]) {\n      rooms++;\n    } else {\n      endIdx++;\n    }\n  }\n  return rooms;\n}"
+    }
+]
+  },
+  {
+    id: 23,
+    frontendId: 23,
+    title: "Merge k Sorted Lists",
+    titleSlug: "merge-k-sorted-lists",
+    difficulty: "Hard",
+    pattern: "Linked List",
+    frequency: "97%",
+    companies: ["Amazon","Meta","Google","Microsoft"],
+    timeComp: "O(N log K)",
+    spaceComp: "O(1)",
+    intuition: "Divide and Conquer: Pairwise merge lists like merge sort until only 1 list remains, or use a Min-Heap of size K.",
+    pitfalls: "Merging lists one-by-one sequentially is slow: O(K * N) instead of O(N log K).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function mergeKLists(lists) {\n  if (!lists || lists.length === 0) return null;\n  const mergeTwo = (l1, l2) => {\n    const dummy = { next: null };\n    let cur = dummy;\n    while (l1 && l2) {\n      if (l1.val <= l2.val) { cur.next = l1; l1 = l1.next; }\n      else { cur.next = l2; l2 = l2.next; }\n      cur = cur.next;\n    }\n    cur.next = l1 || l2;\n    return dummy.next;\n  };\n  while (lists.length > 1) {\n    const merged = [];\n    for (let i = 0; i < lists.length; i += 2) {\n      merged.push(i + 1 < lists.length ? mergeTwo(lists[i], lists[i + 1]) : lists[i]);\n    }\n    lists = merged;\n  }\n  return lists[0];\n}"
+    }
+]
+  },
+  {
+    id: 5,
+    frontendId: 5,
+    title: "Longest Palindromic Substring",
+    titleSlug: "longest-palindromic-substring",
+    difficulty: "Medium",
+    pattern: "Two Pointers",
+    frequency: "96%",
+    companies: ["Amazon","Microsoft","Google"],
+    timeComp: "O(N^2)",
+    spaceComp: "O(1)",
+    intuition: "Expand around center for each index: both odd length palindromes (center at i) and even length palindromes (center between i and i+1).",
+    pitfalls: "Off-by-one errors when substring slicing after expansion stops.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function longestPalindrome(s) {\n  let start = 0, maxLen = 0;\n  const expand = (left, right) => {\n    while (left >= 0 && right < s.length && s[left] === s[right]) {\n      left--;\n      right++;\n    }\n    const len = right - left - 1;\n    if (len > maxLen) {\n      maxLen = len;\n      start = left + 1;\n    }\n  };\n  for (let i = 0; i < s.length; i++) {\n    expand(i, i);\n    expand(i, i + 1);\n  }\n  return s.substring(start, start + maxLen);\n}"
+    }
+]
+  },
+  {
+    id: 647,
+    frontendId: 647,
+    title: "Palindromic Substrings",
+    titleSlug: "palindromic-substrings",
+    difficulty: "Medium",
+    pattern: "Two Pointers",
+    frequency: "90%",
+    companies: ["Facebook","LinkedIn"],
+    timeComp: "O(N^2)",
+    spaceComp: "O(1)",
+    intuition: "Expand around all 2N - 1 possible centers (odd and even) and increment count for each matching symmetric character pair.",
+    pitfalls: "Constructing substrings in memory consumes excessive time and space.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function countSubstrings(s) {\n  let count = 0;\n  const expand = (l, r) => {\n    while (l >= 0 && r < s.length && s[l] === s[r]) {\n      count++;\n      l--;\n      r++;\n    }\n  };\n  for (let i = 0; i < s.length; i++) {\n    expand(i, i);\n    expand(i, i + 1);\n  }\n  return count;\n}"
+    }
+]
+  },
+  {
+    id: 271,
+    frontendId: 271,
+    title: "Encode and Decode Strings",
+    titleSlug: "encode-and-decode-strings",
+    difficulty: "Medium",
+    pattern: "Arrays & Hashing",
+    frequency: "88%",
+    companies: ["Google","Meta"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Chunk transfer encoding: Prepend each string with its length and a delimiter (e.g. '4#lint4#code'). Decoding reads length, skips delimiter, and extracts exact slice.",
+    pitfalls: "Using special delimiter characters without length prefix will fail if the strings themselves contain that delimiter.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function encode(strs) {\n  return strs.map(s => `${s.length}#${s}`).join('');\n}\n\nfunction decode(s) {\n  const res = [];\n  let i = 0;\n  while (i < s.length) {\n    const hashIdx = s.indexOf('#', i);\n    const len = parseInt(s.substring(i, hashIdx), 10);\n    res.push(s.substring(hashIdx + 1, hashIdx + 1 + len));\n    i = hashIdx + 1 + len;\n  }\n  return res;\n}"
+    }
+]
+  },
+  {
+    id: 100,
+    frontendId: 100,
+    title: "Same Tree",
+    titleSlug: "same-tree",
+    difficulty: "Easy",
+    pattern: "Trees",
+    frequency: "92%",
+    companies: ["Amazon","Google"],
+    timeComp: "O(N)",
+    spaceComp: "O(H)",
+    intuition: "Recursive check: If both null, true. If one is null or values differ, false. Recursively check left and right subtrees.",
+    pitfalls: "Missing null checks before accessing node.val.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function isSameTree(p, q) {\n  if (!p && !q) return true;\n  if (!p || !q || p.val !== q.val) return false;\n  return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);\n}"
+    }
+]
+  },
+  {
+    id: 124,
+    frontendId: 124,
+    title: "Binary Tree Maximum Path Sum",
+    titleSlug: "binary-tree-maximum-path-sum",
+    difficulty: "Hard",
+    pattern: "Trees",
+    frequency: "95%",
+    companies: ["Meta","Amazon","Google","ByteDance"],
+    timeComp: "O(N)",
+    spaceComp: "O(H)",
+    intuition: "DFS: At each node, compute max gain from left and right child (clamped to 0). Path sum with current node as peak is node.val + left + right. Return node.val + max(left, right) to parent.",
+    pitfalls: "Forgetting to clamp negative child returns to 0 (don't include branches that decrease total sum).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function maxPathSum(root) {\n  let maxSum = -Infinity;\n  const dfs = (node) => {\n    if (!node) return 0;\n    const left = Math.max(0, dfs(node.left));\n    const right = Math.max(0, dfs(node.right));\n    maxSum = Math.max(maxSum, node.val + left + right);\n    return node.val + Math.max(left, right);\n  };\n  dfs(root);\n  return maxSum;\n}"
+    }
+]
+  },
+  {
+    id: 102,
+    frontendId: 102,
+    title: "Binary Tree Level Order Traversal",
+    titleSlug: "binary-tree-level-order-traversal",
+    difficulty: "Medium",
+    pattern: "Trees",
+    frequency: "96%",
+    companies: ["Amazon","Meta","Bloomberg"],
+    timeComp: "O(N)",
+    spaceComp: "O(N)",
+    intuition: "Queue BFS: Loop while queue is non-empty. For each level, capture queue length, pop that many nodes, and push their children.",
+    pitfalls: "Not capturing queue length before the inner level loop, causing next level nodes to be processed within the current level.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function levelOrder(root) {\n  if (!root) return [];\n  const res = [];\n  const queue = [root];\n  while (queue.length > 0) {\n    const levelSize = queue.length;\n    const currentLevel = [];\n    for (let i = 0; i < levelSize; i++) {\n      const node = queue.shift();\n      currentLevel.push(node.val);\n      if (node.left) queue.push(node.left);\n      if (node.right) queue.push(node.right);\n    }\n    res.push(currentLevel);\n  }\n  return res;\n}"
+    }
+]
+  },
+  {
+    id: 297,
+    frontendId: 297,
+    title: "Serialize and Deserialize Binary Tree",
+    titleSlug: "serialize-and-deserialize-binary-tree",
+    difficulty: "Hard",
+    pattern: "Trees",
+    frequency: "91%",
+    companies: ["Meta","Amazon","Microsoft"],
+    timeComp: "O(N)",
+    spaceComp: "O(N)",
+    intuition: "Preorder traversal DFS: Serialize by outputting val + ',' and '#' for null nodes. Deserialize by splitting into tokens and rebuilding recursively.",
+    pitfalls: "Splitting strings by comma produces extra tokens if not careful with trailing characters.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function serialize(root) {\n  if (!root) return '#';\n  return `${root.val},${serialize(root.left)},${serialize(root.right)}`;\n}\n\nfunction deserialize(data) {\n  const tokens = data.split(',');\n  let index = 0;\n  const build = () => {\n    if (tokens[index] === '#') {\n      index++;\n      return null;\n    }\n    const node = { val: parseInt(tokens[index++], 10), left: null, right: null };\n    node.left = build();\n    node.right = build();\n    return node;\n  };\n  return build();\n}"
+    }
+]
+  },
+  {
+    id: 572,
+    frontendId: 572,
+    title: "Subtree of Another Tree",
+    titleSlug: "subtree-of-another-tree",
+    difficulty: "Easy",
+    pattern: "Trees",
+    frequency: "89%",
+    companies: ["Amazon","Facebook"],
+    timeComp: "O(M * N)",
+    spaceComp: "O(H)",
+    intuition: "For each node in main tree, check if isSameTree(node, subRoot). If not, recurse on left and right subtrees.",
+    pitfalls: "Assuming equal values at root is sufficient without verifying the entire tree structure.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function isSubtree(root, subRoot) {\n  if (!root) return false;\n  const isSame = (p, q) => {\n    if (!p && !q) return true;\n    if (!p || !q || p.val !== q.val) return false;\n    return isSame(p.left, q.left) && isSame(p.right, q.right);\n  };\n  if (isSame(root, subRoot)) return true;\n  return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);\n}"
+    }
+]
+  },
+  {
+    id: 105,
+    frontendId: 105,
+    title: "Construct Binary Tree from Preorder and Inorder Traversal",
+    titleSlug: "construct-binary-tree-from-preorder-and-inorder-traversal",
+    difficulty: "Medium",
+    pattern: "Trees",
+    frequency: "90%",
+    companies: ["Amazon","Microsoft"],
+    timeComp: "O(N)",
+    spaceComp: "O(N)",
+    intuition: "First element of preorder is root. Lookup root in inorder map: elements to left belong to left subtree, elements to right belong to right subtree.",
+    pitfalls: "Using indexOf on inorder array repeatedly degrades performance to O(N^2); build index map beforehand.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function buildTree(preorder, inorder) {\n  const inMap = new Map();\n  inorder.forEach((val, idx) => inMap.set(val, idx));\n  let preIdx = 0;\n  const helper = (left, right) => {\n    if (left > right) return null;\n    const rootVal = preorder[preIdx++];\n    const root = { val: rootVal, left: null, right: null };\n    const mid = inMap.get(rootVal);\n    root.left = helper(left, mid - 1);\n    root.right = helper(mid + 1, right);\n    return root;\n  };\n  return helper(0, inorder.length - 1);\n}"
+    }
+]
+  },
+  {
+    id: 230,
+    frontendId: 230,
+    title: "Kth Smallest Element in a BST",
+    titleSlug: "kth-smallest-element-in-a-bst",
+    difficulty: "Medium",
+    pattern: "Trees",
+    frequency: "93%",
+    companies: ["Amazon","Facebook","Google"],
+    timeComp: "O(H + K)",
+    spaceComp: "O(H)",
+    intuition: "Inorder traversal of a BST visits nodes in strictly ascending order. Traverse iteratively with a stack and stop at step k.",
+    pitfalls: "Traversing the entire tree into an array when you can stop immediately at k.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function kthSmallest(root, k) {\n  const stack = [];\n  let cur = root;\n  while (cur || stack.length > 0) {\n    while (cur) {\n      stack.push(cur);\n      cur = cur.left;\n    }\n    cur = stack.pop();\n    k--;\n    if (k === 0) return cur.val;\n    cur = cur.right;\n  }\n  return -1;\n}"
+    }
+]
+  },
+  {
+    id: 208,
+    frontendId: 208,
+    title: "Implement Trie (Prefix Tree)",
+    titleSlug: "implement-trie-prefix-tree",
+    difficulty: "Medium",
+    pattern: "Tries",
+    frequency: "95%",
+    companies: ["Amazon","Twitter","Google"],
+    timeComp: "O(L) per operation",
+    spaceComp: "O(Total Characters)",
+    intuition: "TrieNode has children map and isEndOfWord boolean. Insert and search traverse character nodes down the tree.",
+    pitfalls: "Distinguishing between exact word match (search checks isEndOfWord) and prefix match (startsWith returns true once prefix exists).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "class TrieNode {\n  constructor() {\n    this.children = {};\n    this.isEnd = false;\n  }\n}\nclass Trie {\n  constructor() { this.root = new TrieNode(); }\n  insert(word) {\n    let node = this.root;\n    for (const c of word) {\n      if (!node.children[c]) node.children[c] = new TrieNode();\n      node = node.children[c];\n    }\n    node.isEnd = true;\n  }\n  search(word) {\n    let node = this.root;\n    for (const c of word) {\n      if (!node.children[c]) return false;\n      node = node.children[c];\n    }\n    return node.isEnd;\n  }\n  startsWith(prefix) {\n    let node = this.root;\n    for (const c of prefix) {\n      if (!node.children[c]) return false;\n      node = node.children[c];\n    }\n    return true;\n  }\n}"
+    }
+]
+  },
+  {
+    id: 211,
+    frontendId: 211,
+    title: "Design Add and Search Words Data Structure",
+    titleSlug: "design-add-and-search-words-data-structure",
+    difficulty: "Medium",
+    pattern: "Tries",
+    frequency: "89%",
+    companies: ["Facebook","Amazon"],
+    timeComp: "O(M) add, O(26^M) wildcard search",
+    spaceComp: "O(Total characters)",
+    intuition: "Trie with DFS search: When character is '.', branch recursively through all non-null child nodes of the current TrieNode.",
+    pitfalls: "Wildcard '.' must check all children and return true if any path finds a match.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "class WordDictionary {\n  constructor() { this.root = {}; }\n  addWord(word) {\n    let node = this.root;\n    for (const c of word) {\n      if (!node[c]) node[c] = {};\n      node = node[c];\n    }\n    node.isEnd = true;\n  }\n  search(word) {\n    const dfs = (idx, node) => {\n      if (idx === word.length) return !!node.isEnd;\n      const c = word[idx];\n      if (c === '.') {\n        for (const key in node) {\n          if (key !== 'isEnd' && dfs(idx + 1, node[key])) return true;\n        }\n        return false;\n      }\n      if (!node[c]) return false;\n      return dfs(idx + 1, node[c]);\n    };\n    return dfs(0, this.root);\n  }\n}"
+    }
+]
+  },
+  {
+    id: 212,
+    frontendId: 212,
+    title: "Word Search II",
+    titleSlug: "word-search-ii",
+    difficulty: "Hard",
+    pattern: "Tries",
+    frequency: "93%",
+    companies: ["Amazon","Microsoft","Google"],
+    timeComp: "O(M * N * 4^L)",
+    spaceComp: "O(Total words characters)",
+    intuition: "Insert all words into a Trie. Run 2D grid backtracking from each cell: walk Trie alongside grid to prune dead paths immediately.",
+    pitfalls: "Visiting duplicate cells (use visited marker) and outputting duplicates (remove word from Trie upon finding it).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function findWords(board, words) {\n  const root = {};\n  for (const w of words) {\n    let node = root;\n    for (const c of w) {\n      if (!node[c]) node[c] = {};\n      node = node[c];\n    }\n    node.word = w;\n  }\n  const res = [];\n  const m = board.length, n = board[0].length;\n  const dfs = (r, c, node) => {\n    if (r < 0 || c < 0 || r >= m || c >= n || !node[board[r][c]]) return;\n    const char = board[r][c];\n    const nextNode = node[char];\n    if (nextNode.word) {\n      res.push(nextNode.word);\n      nextNode.word = null;\n    }\n    board[r][c] = '#';\n    dfs(r + 1, c, nextNode);\n    dfs(r - 1, c, nextNode);\n    dfs(r, c + 1, nextNode);\n    dfs(r, c - 1, nextNode);\n    board[r][c] = char;\n  };\n  for (let i = 0; i < m; i++) {\n    for (let j = 0; j < n; j++) {\n      dfs(i, j, root);\n    }\n  }\n  return res;\n}"
+    }
+]
+  },
 ];
 
 // Helper to provide starter code template for any problem and language

@@ -97,8 +97,7 @@ export default function InterviewPrepPage({ embedded = false }) {
   // Quick Action: Launch Personal Solo Mock Interview Practice
   const handleStartSoloPractice = (problem) => {
     setSelectedPracticeProblem(problem);
-    toast.info(`Opened solo practice workspace for "${problem.title}" ⏱️`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    toast.info(`Opened workspace for "${problem.title}" ⏱️`);
   };
 
   const handleCloseSoloPractice = () => {
@@ -219,19 +218,21 @@ export default function InterviewPrepPage({ embedded = false }) {
         </div>
       </section>
 
-      {/* Embedded Solo Mock Practice Workspace if problem is active */}
+      {/* Dedicated LeetCode-Grade Focused Mock Practice Workspace */}
       {selectedPracticeProblem && (
-        <section className="max-w-7xl mx-auto px-4 pt-6 w-full animate-in fade-in duration-300">
-          <MockPracticeWorkspace
-            problem={selectedPracticeProblem}
-            onClose={handleCloseSoloPractice}
-            onProblemSolved={(probId) => {
-              if (!solvedList.includes(probId)) {
-                toggleSolved(probId);
-              }
-            }}
-          />
-        </section>
+        <MockPracticeWorkspace
+          problem={selectedPracticeProblem}
+          allProblems={CURATED_PROBLEMS}
+          solvedList={solvedList}
+          onToggleSolved={toggleSolved}
+          onSelectProblem={(prob) => setSelectedPracticeProblem(prob)}
+          onClose={handleCloseSoloPractice}
+          onProblemSolved={(probId) => {
+            if (!solvedList.includes(probId)) {
+              toggleSolved(probId);
+            }
+          }}
+        />
       )}
 
       {/* Navigation Tabs */}
@@ -379,8 +380,10 @@ export default function InterviewPrepPage({ embedded = false }) {
                             <span className="font-mono text-xs font-semibold text-slate-400">
                               #{prob.frontendId}
                             </span>
-                            <span className="font-bold text-sm text-slate-100 hover:text-indigo-400 transition cursor-pointer"
-                              onClick={() => setExpandedProblemId(isExpanded ? null : prob.id)}
+                            <span
+                              className="font-bold text-sm text-slate-100 hover:text-indigo-400 transition cursor-pointer"
+                              onClick={() => handleStartSoloPractice(prob)}
+                              title="Open in LeetCode-style workspace"
                             >
                               {prob.title}
                             </span>
