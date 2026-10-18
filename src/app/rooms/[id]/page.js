@@ -231,6 +231,29 @@ const SUPPORTED_LANGUAGES = [
   { id: "typescript", label: "TypeScript", lcSlug: "typescript" },
 ];
 
+// 🎨 Vibrant color palette for collaborative Monaco cursor & selection highlights
+const PEER_PALETTE = [
+  { name: "indigo", hex: "#818cf8" },
+  { name: "emerald", hex: "#34d399" },
+  { name: "amber", hex: "#fbbf24" },
+  { name: "rose", hex: "#fb7185" },
+  { name: "cyan", hex: "#22d3ee" },
+  { name: "purple", hex: "#c084fc" },
+  { name: "pink", hex: "#f472b6" },
+  { name: "orange", hex: "#fb923c" },
+];
+
+const getPeerColor = (idOrName) => {
+  if (!idOrName) return PEER_PALETTE[0];
+  let hash = 0;
+  const str = String(idOrName);
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return PEER_PALETTE[Math.abs(hash) % PEER_PALETTE.length];
+};
+
 export default function StudyRoomPage() {
   const { id: roomId } = useParams();
   const { user, loading } = useAuth();
@@ -303,7 +326,7 @@ export default function StudyRoomPage() {
   const [problemSplitPercent, setProblemSplitPercent] = useState(45);
   const [consoleHeight, setConsoleHeight] = useState(250);
   const [fontSize, setFontSize] = useState(14);
-  const [typingPeer, setTypingPeer] = useState("");
+  const [typingPeers, setTypingPeers] = useState({}); // { [peerKey]: { name, timeout } }
 
   // 🎙️ WebRTC Voice & Video Mesh State
   const [isInCall, setIsInCall] = useState(false);
@@ -332,6 +355,9 @@ export default function StudyRoomPage() {
   const socketRef = useRef(null);
   const chatBottomRef = useRef(null);
   const editorRef = useRef(null);
+  const monacoRef = useRef(null);
+  const remoteCursorsRef = useRef(new Map()); // peerKey -> { widget, domNode, caretEl, tooltipEl, nameEl, typingEl, decorations, position, color }
+  const lastCursorEmitRef = useRef(0);
   const workspaceRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -438,6 +464,198 @@ export default function StudyRoomPage() {
     }
   }, [isInCall, camOff, isScreenSharing]);
 
+  // 👥 Monaco Collaborative Remote Cursors & Typing Helpers
+  const updateRemoteCursor = ({ userId, socketId, name, cursor, selection }) => {
+    const editor = editorRef.current;
+    const monaco = monacoRef.current;
+    if (!editor || !monaco) return;
+
+    const peerKey = String(userId || socketId);
+    const color = getPeerColor(peerKey || name);
+
+    let peerRecord = remoteCursorsRef.current.get(peerKey);
+
+    if (!peerRecord) {
+      const domNode = document.createElement("div");
+      domNode.className = "monaco-remote-cursor";
+
+      const caretEl = document.createElement("div");
+      caretEl.className = "monaco-remote-cursor-caret";
+      caretEl.style.backgroundColor = color.hex;
+      caretEl.style.boxShadow = `0 0 8px ${color.hex}`;
+
+      const tooltipEl = document.createElement("div");
+      tooltipEl.className = "monaco-remote-cursor-tooltip";
+      tooltipEl.style.backgroundColor = color.hex;
+
+      const nameEl = document.createElement("span");
+      nameEl.textContent = name || "Peer";
+
+      const typingEl = document.createElement("span");
+      typingEl.style.display = "none";
+      typingEl.style.marginLeft = "3px";
+      typingEl.textContent = "✍️ typing...";
+
+      tooltipEl.appendChild(nameEl);
+      tooltipEl.appendChild(typingEl);
+      domNode.appendChild(caretEl);
+      domNode.appendChild(tooltipEl);
+
+      const widget = {
+        getId: () => `remote-cursor-${peerKey}`,
+        getDomNode: () => domNode,
+        getPosition: () => {
+          const rec = remoteCursorsRef.current.get(peerKey);
+          if (!rec || !rec.position) return null;
+          return {
+            position: rec.position,
+            preference: [monaco.editor.ContentWidgetPositionPreference.EXACT],
+          };
+        },
+      };
+
+      editor.addContentWidget(widget);
+
+      peerRecord = {
+        peerKey,
+        name: name || "Peer",
+        color,
+        widget,
+        domNode,
+        caretEl,
+        tooltipEl,
+        nameEl,
+        typingEl,
+        decorations: [],
+        position: null,
+      };
+
+      remoteCursorsRef.current.set(peerKey, peerRecord);
+    }
+
+    if (cursor && cursor.lineNumber && cursor.column) {
+      peerRecord.position = {
+        lineNumber: cursor.lineNumber,
+        column: cursor.column,
+      };
+
+      if (cursor.lineNumber === 1) {
+        peerRecord.tooltipEl.classList.add("top-flip");
+      } else {
+        peerRecord.tooltipEl.classList.remove("top-flip");
+      }
+
+      editor.layoutContentWidget(peerRecord.widget);
+    }
+
+    if (
+      selection &&
+      (selection.startLineNumber !== selection.endLineNumber ||
+        selection.startColumn !== selection.endColumn)
+    ) {
+      const range = new monaco.Range(
+        selection.startLineNumber,
+        selection.startColumn,
+        selection.endLineNumber,
+        selection.endColumn
+      );
+      peerRecord.decorations = editor.deltaDecorations(peerRecord.decorations || [], [
+        {
+          range,
+          options: {
+            className: `remote-selection-${color.name}`,
+            isWholeLine: false,
+            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+          },
+        },
+      ]);
+    } else if (peerRecord.decorations?.length > 0) {
+      peerRecord.decorations = editor.deltaDecorations(peerRecord.decorations, []);
+    }
+  };
+
+  const removeRemoteCursor = (userIdOrSocketId) => {
+    const editor = editorRef.current;
+    const peerKey = String(userIdOrSocketId);
+    const peerRecord = remoteCursorsRef.current.get(peerKey);
+    if (peerRecord) {
+      if (editor) {
+        try {
+          if (peerRecord.widget) editor.removeContentWidget(peerRecord.widget);
+          if (peerRecord.decorations?.length) editor.deltaDecorations(peerRecord.decorations, []);
+        } catch (e) {}
+      }
+      remoteCursorsRef.current.delete(peerKey);
+    }
+  };
+
+  const updateRemoteTypingState = (userIdOrSocketId, name, isTyping) => {
+    const peerKey = String(userIdOrSocketId);
+    const peerRecord = remoteCursorsRef.current.get(peerKey);
+    if (peerRecord && peerRecord.typingEl) {
+      if (isTyping) {
+        peerRecord.typingEl.style.display = "inline";
+        peerRecord.caretEl.style.boxShadow = `0 0 12px ${peerRecord.color.hex}, 0 0 4px #fff`;
+      } else {
+        peerRecord.typingEl.style.display = "none";
+        peerRecord.caretEl.style.boxShadow = `0 0 8px ${peerRecord.color.hex}`;
+      }
+    }
+  };
+
+  const handleLocalCursorChange = (position, selection = null) => {
+    if (!socketRef.current || !roomId || !position) return;
+    const now = Date.now();
+    if (now - lastCursorEmitRef.current < 40) return; // Max 25 emits/sec for smooth performance
+    lastCursorEmitRef.current = now;
+
+    socketRef.current.emit("cursor_change", {
+      roomId,
+      cursor: {
+        lineNumber: position.lineNumber,
+        column: position.column,
+      },
+      selection: selection
+        ? {
+            startLineNumber: selection.startLineNumber,
+            startColumn: selection.startColumn,
+            endLineNumber: selection.endLineNumber,
+            endColumn: selection.endColumn,
+          }
+        : null,
+    });
+  };
+
+  // Auto-expire stale peer typing indicator states after 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setTypingPeers((prev) => {
+        let changed = false;
+        const next = { ...prev };
+        Object.keys(next).forEach((k) => {
+          if (now - next[k].timeout > 3000) {
+            updateRemoteTypingState(k, next[k].name, false);
+            delete next[k];
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const typingPeersList = Object.values(typingPeers).map((p) => p.name).filter(Boolean);
+  const typingLabel =
+    typingPeersList.length === 0
+      ? ""
+      : typingPeersList.length === 1
+      ? `${typingPeersList[0]} is typing...`
+      : typingPeersList.length === 2
+      ? `${typingPeersList[0]} and ${typingPeersList[1]} are typing...`
+      : `${typingPeersList[0]} and ${typingPeersList.length - 1} others are typing...`;
+
   // 1. Auth Guard
   useEffect(() => {
     if (!loading && !user) {
@@ -502,9 +720,17 @@ export default function StudyRoomPage() {
       toast.info(`${name} joined the study room 👋`, { duration: 3000 });
     });
 
-    socket.on("user_left", ({ name }) => {
+    socket.on("user_left", ({ userId, name }) => {
       playNotificationSound("leave");
       toast(`${name} left the room 🚪`, { duration: 3000 });
+      if (userId) {
+        removeRemoteCursor(userId);
+        setTypingPeers((prev) => {
+          const next = { ...prev };
+          delete next[String(userId)];
+          return next;
+        });
+      }
     });
 
     socket.on("new_message", (message) => {
@@ -529,12 +755,39 @@ export default function StudyRoomPage() {
       setCode(newCode);
     });
 
-    socket.on("peer_typing_update", ({ name, isTyping }) => {
-      if (isTyping) {
-        setTypingPeer(name);
-      } else {
-        setTypingPeer("");
-      }
+    // 👥 Remote Peer Cursor & Live Selection Sync
+    socket.on("cursor_update", ({ userId, socketId, name, cursor, selection }) => {
+      if (user && String(userId) === String(user._id)) return;
+      updateRemoteCursor({ userId, socketId, name, cursor, selection });
+    });
+
+    // ✍️ Remote Peer Live Typing Sync
+    socket.on("peer_typing_update", ({ userId, socketId, name, isTyping }) => {
+      const peerKey = String(userId || socketId);
+      if (user && String(userId) === String(user._id)) return;
+
+      updateRemoteTypingState(peerKey, name, isTyping);
+
+      setTypingPeers((prev) => {
+        if (isTyping) {
+          return { ...prev, [peerKey]: { name, timeout: Date.now() } };
+        } else {
+          const next = { ...prev };
+          delete next[peerKey];
+          return next;
+        }
+      });
+    });
+
+    // 🧹 Remote Peer Cursor Removal
+    socket.on("peer_cursor_remove", ({ userId, socketId }) => {
+      const peerKey = String(userId || socketId);
+      removeRemoteCursor(peerKey);
+      setTypingPeers((prev) => {
+        const next = { ...prev };
+        delete next[peerKey];
+        return next;
+      });
     });
 
     socket.on("language_update", ({ language: newLanguage }) => {
@@ -728,6 +981,17 @@ export default function StudyRoomPage() {
     });
 
     return () => {
+      // Clean up remote cursor widgets & decorations from editor
+      if (editorRef.current) {
+        remoteCursorsRef.current.forEach((peerRecord) => {
+          try {
+            if (peerRecord.widget) editorRef.current.removeContentWidget(peerRecord.widget);
+            if (peerRecord.decorations?.length) editorRef.current.deltaDecorations(peerRecord.decorations, []);
+          } catch (e) {}
+        });
+      }
+      remoteCursorsRef.current.clear();
+
       if (localStreamRef.current) {
         localStreamRef.current.getTracks().forEach((track) => track.stop());
         localStreamRef.current = null;
@@ -1138,6 +1402,30 @@ export default function StudyRoomPage() {
       typingTimeoutRef.current = setTimeout(() => {
         socketRef.current?.emit("peer_typing", { roomId, isTyping: false });
       }, 1500);
+
+      // Emit cursor position immediately upon typing
+      if (editorRef.current) {
+        const pos = editorRef.current.getPosition();
+        const sel = editorRef.current.getSelection();
+        const hasSelection =
+          sel &&
+          (sel.startLineNumber !== sel.endLineNumber ||
+            sel.startColumn !== sel.endColumn);
+        if (pos) {
+          socketRef.current.emit("cursor_change", {
+            roomId,
+            cursor: { lineNumber: pos.lineNumber, column: pos.column },
+            selection: hasSelection
+              ? {
+                  startLineNumber: sel.startLineNumber,
+                  startColumn: sel.startColumn,
+                  endLineNumber: sel.endLineNumber,
+                  endColumn: sel.endColumn,
+                }
+              : null,
+          });
+        }
+      }
     }
   };
 
@@ -2032,10 +2320,10 @@ export default function StudyRoomPage() {
                     </select>
 
                     {/* Peer Typing Presence Pill */}
-                    {typingPeer && (
-                      <span className="hidden xl:inline-flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 animate-pulse font-medium shrink-0">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                        {typingPeer} is typing...
+                    {typingLabel && (
+                      <span className="inline-flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-medium shrink-0 animate-pulse shadow-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                        <span>{typingLabel}</span>
                       </span>
                     )}
                   </div>
@@ -2085,6 +2373,30 @@ export default function StudyRoomPage() {
                     value={code}
                     onMount={(editor, monaco) => {
                       editorRef.current = editor;
+                      monacoRef.current = monaco;
+
+                      // Synchronize cursor position on every cursor move
+                      editor.onDidChangeCursorPosition((e) => {
+                        const sel = editor.getSelection();
+                        const hasSelection =
+                          sel &&
+                          (sel.startLineNumber !== sel.endLineNumber ||
+                            sel.startColumn !== sel.endColumn);
+                        handleLocalCursorChange(e.position, hasSelection ? sel : null);
+                      });
+
+                      // Synchronize selection on every text highlight change
+                      editor.onDidChangeCursorSelection((e) => {
+                        const sel = e.selection;
+                        const hasSelection =
+                          sel &&
+                          (sel.startLineNumber !== sel.endLineNumber ||
+                            sel.startColumn !== sel.endColumn);
+                        handleLocalCursorChange(
+                          { lineNumber: sel.positionLineNumber, column: sel.positionColumn },
+                          hasSelection ? sel : null
+                        );
+                      });
 
                       // Support Ctrl + / Cmd + and Ctrl - / Cmd - zoom
                       editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal, () => {

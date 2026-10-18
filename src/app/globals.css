@@ -139,3 +139,60 @@ body {
   background-color: #0f172a;
   color: #f1f5f9;
 }
+
+/* 👥 Collaborative Monaco Remote Cursors & Selections */
+.monaco-remote-cursor {
+  position: relative;
+  pointer-events: none !important;
+  z-index: 50;
+}
+
+.monaco-remote-cursor-caret {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 19px;
+  border-radius: 1px;
+  animation: remoteCursorPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes remoteCursorPulse {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  50% { opacity: 0.5; transform: scaleY(0.95); }
+}
+
+.monaco-remote-cursor-tooltip {
+  position: absolute;
+  top: -22px;
+  left: -2px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.3;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #ffffff;
+  white-space: nowrap;
+  pointer-events: none !important;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  user-select: none;
+}
+
+.monaco-remote-cursor-tooltip.top-flip {
+  top: 20px;
+}
+
+/* Remote selection highlights */
+.remote-selection-indigo { background-color: rgba(99, 102, 241, 0.28) !important; border-radius: 2px; }
+.remote-selection-emerald { background-color: rgba(16, 185, 129, 0.28) !important; border-radius: 2px; }
+.remote-selection-amber { background-color: rgba(245, 158, 11, 0.28) !important; border-radius: 2px; }
+.remote-selection-rose { background-color: rgba(244, 63, 94, 0.28) !important; border-radius: 2px; }
+.remote-selection-cyan { background-color: rgba(6, 182, 212, 0.28) !important; border-radius: 2px; }
+.remote-selection-purple { background-color: rgba(168, 85, 247, 0.28) !important; border-radius: 2px; }
+.remote-selection-pink { background-color: rgba(236, 72, 153, 0.28) !important; border-radius: 2px; }
+.remote-selection-orange { background-color: rgba(249, 115, 22, 0.28) !important; border-radius: 2px; }
