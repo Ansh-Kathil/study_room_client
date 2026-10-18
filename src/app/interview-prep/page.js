@@ -247,7 +247,7 @@ export default function InterviewPrepPage({ embedded = false }) {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>DSA Patterns ({CURATED_PROBLEMS.length})</span>
+            <span>Blind 75 Problems ({CURATED_PROBLEMS.length})</span>
           </button>
 
           <button

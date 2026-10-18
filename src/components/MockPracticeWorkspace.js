@@ -582,7 +582,7 @@ export default function MockPracticeWorkspace({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
                   <Layers className="w-4 h-4 text-indigo-400" />
-                  <span>Curated Questions</span>
+                  <span>Blind 75 Questions</span>
                 </div>
                 <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
                   <CheckCheck className="w-3 h-3" />

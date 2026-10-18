@@ -1,6 +1,5 @@
 // Curated high-frequency Blind 75 / FAANG interview problems with multi-language starter templates
 export const CURATED_PROBLEMS = [
-  // Arrays & Hashing
   {
     id: 1,
     frontendId: 1,
@@ -9,1017 +8,112 @@ export const CURATED_PROBLEMS = [
     difficulty: "Easy",
     pattern: "Arrays & Hashing",
     frequency: "99%",
-    companies: ["Google", "Meta", "Amazon", "Apple"],
+    companies: ["Google","Meta","Amazon","Apple"],
     timeComp: "O(N)",
     spaceComp: "O(N)",
     intuition: "Use a Hash Map to store each number and its index. For every element x, check if (target - x) already exists in the map in O(1) time.",
     pitfalls: "Do not use the same element twice. Watch out for negative values and duplicate entries.",
     codeSnippets: [
-      {
-        lang: "JavaScript",
-        langSlug: "javascript",
-        code: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-function twoSum(nums, target) {
-  const map = new Map();
-  for (let i = 0; i < nums.length; i++) {
-    const diff = target - nums[i];
-    if (map.has(diff)) {
-      return [map.get(diff), i];
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n  const map = new Map();\n  for (let i = 0; i < nums.length; i++) {\n    const diff = target - nums[i];\n    if (map.has(diff)) {\n      return [map.get(diff), i];\n    }\n    map.set(nums[i], i);\n  }\n  return [];\n}"
+    },
+    {
+        "lang": "Python",
+        "langSlug": "python3",
+        "code": "class Solution:\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        seen = {}\n        for i, num in enumerate(nums):\n            diff = target - num\n            if diff in seen:\n                return [seen[diff], i]\n            seen[num] = i\n        return []"
+    },
+    {
+        "lang": "C++",
+        "langSlug": "cpp",
+        "code": "#include <vector>\n#include <unordered_map>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        unordered_map<int, int> seen;\n        for (int i = 0; i < nums.size(); i++) {\n            int diff = target - nums[i];\n            if (seen.find(diff) != seen.end()) {\n                return {seen[diff], i};\n            }\n            seen[nums[i]] = i;\n        }\n        return {};\n    }\n};"
+    },
+    {
+        "lang": "Java",
+        "langSlug": "java",
+        "code": "import java.util.HashMap;\nimport java.util.Map;\n\nclass Solution {\n    public int[] twoSum(int[] nums, int target) {\n        Map<Integer, Integer> map = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            int diff = target - nums[i];\n            if (map.containsKey(diff)) {\n                return new int[] { map.get(diff), i };\n            }\n            map.put(nums[i], i);\n        }\n        return new int[0];\n    }\n}"
+    },
+    {
+        "lang": "TypeScript",
+        "langSlug": "typescript",
+        "code": "function twoSum(nums: number[], target: number): number[] {\n  const map = new Map<number, number>();\n  for (let i = 0; i < nums.length; i++) {\n    const diff = target - nums[i];\n    if (map.has(diff)) {\n      return [map.get(diff)!, i];\n    }\n    map.set(nums[i], i);\n  }\n  return [];\n}"
     }
-    map.set(nums[i], i);
-  }
-  return [];
-}`,
-      },
-      {
-        lang: "Python",
-        langSlug: "python3",
-        code: `class Solution:
-    def twoSum(self, nums: list[int], target: int) -> list[int]:
-        seen = {}
-        for i, num in enumerate(nums):
-            diff = target - num
-            if diff in seen:
-                return [seen[diff], i]
-            seen[num] = i
-        return []`,
-      },
-      {
-        lang: "C++",
-        langSlug: "cpp",
-        code: `#include <vector>
-#include <unordered_map>
-using namespace std;
-
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        unordered_map<int, int> seen;
-        for (int i = 0; i < nums.size(); i++) {
-            int diff = target - nums[i];
-            if (seen.find(diff) != seen.end()) {
-                return {seen[diff], i};
-            }
-            seen[nums[i]] = i;
-        }
-        return {};
-    }
-};`,
-      },
-      {
-        lang: "Java",
-        langSlug: "java",
-        code: `import java.util.HashMap;
-import java.util.Map;
-
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> map = new HashMap<>();
-        for (int i = 0; i < nums.length; i++) {
-            int diff = target - nums[i];
-            if (map.containsKey(diff)) {
-                return new int[] { map.get(diff), i };
-            }
-            map.put(nums[i], i);
-        }
-        return new int[0];
-    }
-}`,
-      },
-      {
-        lang: "TypeScript",
-        langSlug: "typescript",
-        code: `function twoSum(nums: number[], target: number): number[] {
-  const map = new Map<number, number>();
-  for (let i = 0; i < nums.length; i++) {
-    const diff = target - nums[i];
-    if (map.has(diff)) {
-      return [map.get(diff)!, i];
-    }
-    map.set(nums[i], i);
-  }
-  return [];
-}`,
-      },
-    ],
+]
   },
   {
-    id: 217,
-    frontendId: 217,
-    title: "Contains Duplicate",
-    titleSlug: "contains-duplicate",
-    difficulty: "Easy",
-    pattern: "Arrays & Hashing",
-    frequency: "92%",
-    companies: ["Amazon", "Apple", "Microsoft"],
-    timeComp: "O(N)",
-    spaceComp: "O(N)",
-    intuition: "Insert elements into a Hash Set. If set.has(val) returns true, an immediate duplicate exists.",
-    pitfalls: "Sorting takes O(N log N) time and O(1) space if memory is strictly constrained.",
-    codeSnippets: [
-      {
-        lang: "JavaScript",
-        langSlug: "javascript",
-        code: `function containsDuplicate(nums) {
-  const seen = new Set();
-  for (const n of nums) {
-    if (seen.has(n)) return true;
-    seen.add(n);
-  }
-  return false;
-}`,
-      },
-      {
-        lang: "Python",
-        langSlug: "python3",
-        code: `class Solution:
-    def containsDuplicate(self, nums: list[int]) -> bool:
-        return len(nums) != len(set(nums))`,
-      },
-      {
-        lang: "C++",
-        langSlug: "cpp",
-        code: `#include <vector>
-#include <unordered_set>
-using namespace std;
-
-class Solution {
-public:
-    bool containsDuplicate(vector<int>& nums) {
-        unordered_set<int> seen;
-        for (int n : nums) {
-            if (seen.count(n)) return true;
-            seen.insert(n);
-        }
-        return false;
-    }
-};`,
-      },
-      {
-        lang: "Java",
-        langSlug: "java",
-        code: `import java.util.HashSet;
-import java.util.Set;
-
-class Solution {
-    public boolean containsDuplicate(int[] nums) {
-        Set<Integer> set = new HashSet<>();
-        for (int n : nums) {
-            if (!set.add(n)) return true;
-        }
-        return false;
-    }
-}`,
-      },
-      {
-        lang: "TypeScript",
-        langSlug: "typescript",
-        code: `function containsDuplicate(nums: number[]): boolean {
-  return new Set(nums).size !== nums.length;
-}`,
-      },
-    ],
-  },
-  {
-    id: 242,
-    frontendId: 242,
-    title: "Valid Anagram",
-    titleSlug: "valid-anagram",
-    difficulty: "Easy",
-    pattern: "Arrays & Hashing",
-    frequency: "88%",
-    companies: ["Meta", "Bloomberg", "Amazon"],
-    timeComp: "O(N)",
-    spaceComp: "O(1) [26 alphabet letters]",
-    intuition: "Count character frequencies using an array of size 26 or a hash map. Both strings must have matching counts.",
-    pitfalls: "Verify whether inputs contain non-ASCII Unicode characters before fixing buffer size to 26.",
-    codeSnippets: [
-      {
-        lang: "JavaScript",
-        langSlug: "javascript",
-        code: `function isAnagram(s, t) {
-  if (s.length !== t.length) return false;
-  const count = {};
-  for (const c of s) count[c] = (count[c] || 0) + 1;
-  for (const c of t) {
-    if (!count[c]) return false;
-    count[c]--;
-  }
-  return true;
-}`,
-      },
-      {
-        lang: "Python",
-        langSlug: "python3",
-        code: `from collections import Counter
-
-class Solution:
-    def isAnagram(self, s: str, t: str) -> bool:
-        return Counter(s) == Counter(t)`,
-      },
-      {
-        lang: "C++",
-        langSlug: "cpp",
-        code: `#include <string>
-#include <vector>
-using namespace std;
-
-class Solution {
-public:
-    bool isAnagram(string s, string t) {
-        if (s.length() != t.length()) return false;
-        vector<int> counts(26, 0);
-        for (char c : s) counts[c - 'a']++;
-        for (char c : t) {
-            if (--counts[c - 'a'] < 0) return false;
-        }
-        return true;
-    }
-};`,
-      },
-      {
-        lang: "Java",
-        langSlug: "java",
-        code: `class Solution {
-    public boolean isAnagram(String s, String t) {
-        if (s.length() != t.length()) return false;
-        int[] counts = new int[26];
-        for (char c : s.toCharArray()) counts[c - 'a']++;
-        for (char c : t.toCharArray()) {
-            if (--counts[c - 'a'] < 0) return false;
-        }
-        return true;
-    }
-}`,
-      },
-      {
-        lang: "TypeScript",
-        langSlug: "typescript",
-        code: `function isAnagram(s: string, t: string): boolean {
-  if (s.length !== t.length) return false;
-  const count: Record<string, number> = {};
-  for (const c of s) count[c] = (count[c] || 0) + 1;
-  for (const c of t) {
-    if (!count[c]) return false;
-    count[c]--;
-  }
-  return true;
-}`,
-      },
-    ],
-  },
-  {
-    id: 49,
-    frontendId: 49,
-    title: "Group Anagrams",
-    titleSlug: "group-anagrams",
-    difficulty: "Medium",
-    pattern: "Arrays & Hashing",
-    frequency: "95%",
-    companies: ["Amazon", "Meta", "Google"],
-    timeComp: "O(N * K log K) or O(N * K)",
-    spaceComp: "O(N * K)",
-    intuition: "Use sorted string representation or a 26-char frequency tuple as the dictionary key to group words.",
-    pitfalls: "Creating string keys must be consistent across differing languages.",
-  },
-  {
-    id: 238,
-    frontendId: 238,
-    title: "Product of Array Except Self",
-    titleSlug: "product-of-array-except-self",
-    difficulty: "Medium",
-    pattern: "Arrays & Hashing",
-    frequency: "96%",
-    companies: ["Amazon", "Meta", "Apple", "Microsoft"],
-    timeComp: "O(N)",
-    spaceComp: "O(1) [excluding output array]",
-    intuition: "Calculate prefix products in a forward pass, then multiply by suffix products in a backward pass without using the division operator.",
-    pitfalls: "Division by zero traps if using total product / nums[i]. Follow problem constraint: division is forbidden.",
-  },
-  {
-    id: 128,
-    frontendId: 128,
-    title: "Longest Consecutive Sequence",
-    titleSlug: "longest-consecutive-sequence",
-    difficulty: "Medium",
-    pattern: "Arrays & Hashing",
-    frequency: "90%",
-    companies: ["Google", "Amazon", "Spotify"],
-    timeComp: "O(N)",
-    spaceComp: "O(N)",
-    intuition: "Insert all elements into a Set. Only initiate a sequence check if (num - 1) is NOT in the set (identifies sequence starts).",
-    pitfalls: "Checking from every element without the start condition degrades performance to O(N²).",
-  },
-
-  // Two Pointers
-  {
-    id: 125,
-    frontendId: 125,
-    title: "Valid Palindrome",
-    titleSlug: "valid-palindrome",
-    difficulty: "Easy",
-    pattern: "Two Pointers",
-    frequency: "89%",
-    companies: ["Meta", "Microsoft", "Uber"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Use left and right pointers moving inward, skipping non-alphanumeric characters and comparing lowercase chars.",
-    pitfalls: "Ignoring non-alphanumeric punctuation and case-sensitivity.",
-    codeSnippets: [
-      {
-        lang: "JavaScript",
-        langSlug: "javascript",
-        code: `function isPalindrome(s) {
-  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, "");
-  let l = 0, r = clean.length - 1;
-  while (l < r) {
-    if (clean[l] !== clean[r]) return false;
-    l++;
-    r--;
-  }
-  return true;
-}`,
-      },
-      {
-        lang: "Python",
-        langSlug: "python3",
-        code: `class Solution:
-    def isPalindrome(self, s: str) -> bool:
-        clean = [c.lower() for c in s if c.isalnum()]
-        return clean == clean[::-1]`,
-      },
-      {
-        lang: "C++",
-        langSlug: "cpp",
-        code: `#include <string>
-#include <cctype>
-using namespace std;
-
-class Solution {
-public:
-    bool isPalindrome(string s) {
-        int l = 0, r = s.size() - 1;
-        while (l < r) {
-            while (l < r && !isalnum(s[l])) l++;
-            while (l < r && !isalnum(s[r])) r--;
-            if (tolower(s[l]) != tolower(s[r])) return false;
-            l++;
-            r--;
-        }
-        return true;
-    }
-};`,
-      },
-      {
-        lang: "Java",
-        langSlug: "java",
-        code: `class Solution {
-    public boolean isPalindrome(String s) {
-        int l = 0, r = s.length() - 1;
-        while (l < r) {
-            while (l < r && !Character.isLetterOrDigit(s.charAt(l))) l++;
-            while (l < r && !Character.isLetterOrDigit(s.charAt(r))) r--;
-            if (Character.toLowerCase(s.charAt(l)) != Character.toLowerCase(s.charAt(r))) return false;
-            l++;
-            r--;
-        }
-        return true;
-    }
-}`,
-      },
-      {
-        lang: "TypeScript",
-        langSlug: "typescript",
-        code: `function isPalindrome(s: string): boolean {
-  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, "");
-  let l = 0, r = clean.length - 1;
-  while (l < r) {
-    if (clean[l] !== clean[r]) return false;
-    l++;
-    r--;
-  }
-  return true;
-}`,
-      },
-    ],
-  },
-  {
-    id: 15,
-    frontendId: 15,
-    title: "3Sum",
-    titleSlug: "3sum",
-    difficulty: "Medium",
-    pattern: "Two Pointers",
-    frequency: "98%",
-    companies: ["Meta", "Amazon", "Apple", "Google"],
-    timeComp: "O(N²)",
-    spaceComp: "O(1) or O(N)",
-    intuition: "Sort array first. Fix element i, then use two pointers (left & right) to find pairs summing to -nums[i]. Skip duplicates.",
-    pitfalls: "Duplicate triplets! Ensure you skip identical values after advancing both pointers.",
-  },
-  {
-    id: 11,
-    frontendId: 11,
-    title: "Container With Most Water",
-    titleSlug: "container-with-most-water",
-    difficulty: "Medium",
-    pattern: "Two Pointers",
-    frequency: "94%",
-    companies: ["Google", "Amazon", "Meta"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Start pointers at both ends. Compute area = min(h[l], h[r]) * (r - l). Always advance the pointer pointing to the shorter vertical bar.",
-    pitfalls: "Moving the taller pointer cannot possibly produce a larger area since width shrinks.",
-  },
-  {
-    id: 42,
-    frontendId: 42,
-    title: "Trapping Rain Water",
-    titleSlug: "trapping-rain-water",
-    difficulty: "Hard",
-    pattern: "Two Pointers",
-    frequency: "97%",
-    companies: ["Google", "Meta", "Amazon", "Goldman Sachs"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Two pointers keeping track of maxLeft and maxRight boundaries. Water at current index is determined by min(maxL, maxR) - height.",
-    pitfalls: "Ensure pointers move strictly according to which boundary is smaller.",
-  },
-
-  // Sliding Window
-  {
-    id: 121,
+    id: 2,
     frontendId: 121,
     title: "Best Time to Buy and Sell Stock",
     titleSlug: "best-time-to-buy-and-sell-stock",
     difficulty: "Easy",
     pattern: "Sliding Window",
     frequency: "99%",
-    companies: ["Amazon", "Meta", "Google", "Bloomberg"],
+    companies: ["Amazon","Meta","Google","Bloomberg"],
     timeComp: "O(N)",
     spaceComp: "O(1)",
     intuition: "Track minimum buying price seen so far. At each step, calculate potential profit and update maxProfit.",
     pitfalls: "Do not sell before buying. A simple single-pass scan suffices.",
+    codeSnippets: []
   },
   {
     id: 3,
-    frontendId: 3,
-    title: "Longest Substring Without Repeating Characters",
-    titleSlug: "longest-substring-without-repeating-characters",
-    difficulty: "Medium",
-    pattern: "Sliding Window",
-    frequency: "98%",
-    companies: ["Amazon", "Microsoft", "Meta", "Google"],
-    timeComp: "O(N)",
-    spaceComp: "O(min(N, M))",
-    intuition: "Sliding window with two pointers [l, r]. Use a Map of char -> lastIndex. If duplicate seen at or after l, jump l to lastIndex + 1.",
-    pitfalls: "Updating left pointer to an old index behind current left window position.",
-  },
-  {
-    id: 424,
-    frontendId: 424,
-    title: "Longest Repeating Character Replacement",
-    titleSlug: "longest-repeating-character-replacement",
-    difficulty: "Medium",
-    pattern: "Sliding Window",
-    frequency: "87%",
-    companies: ["Google", "Uber", "Amazon"],
-    timeComp: "O(N)",
-    spaceComp: "O(26)",
-    intuition: "Window is valid if (windowLength - maxCharFrequency) <= k. If invalid, shrink from left.",
-    pitfalls: "Do not recompute maxCharFrequency from scratch on every shrink; maintaining historical max works.",
-  },
-  {
-    id: 76,
-    frontendId: 76,
-    title: "Minimum Window Substring",
-    titleSlug: "minimum-window-substring",
-    difficulty: "Hard",
-    pattern: "Sliding Window",
-    frequency: "93%",
-    companies: ["Meta", "Amazon", "LinkedIn", "Google"],
-    timeComp: "O(N + M)",
-    spaceComp: "O(1) [ASCII]",
-    intuition: "Expand right until window contains all target characters. Then shrink from left while maintaining validity to find minimum window.",
-    pitfalls: "Comparing frequency maps vs maintaining a 'matched count' counter variable for O(1) checks.",
-  },
-
-  // Stack & Binary Search
-  {
-    id: 20,
-    frontendId: 20,
-    title: "Valid Parentheses",
-    titleSlug: "valid-parentheses",
+    frontendId: 217,
+    title: "Contains Duplicate",
+    titleSlug: "contains-duplicate",
     difficulty: "Easy",
-    pattern: "Stack & Binary Search",
-    frequency: "98%",
-    companies: ["Meta", "Amazon", "Google", "Microsoft"],
-    timeComp: "O(N)",
-    spaceComp: "O(N)",
-    intuition: "Push opening brackets to stack. For closing brackets, pop and verify matching opening bracket type. Stack must be empty at end.",
-    pitfalls: "Popping from an empty stack or ending with leftover unmatched opening brackets.",
-  },
-  {
-    id: 155,
-    frontendId: 155,
-    title: "Min Stack",
-    titleSlug: "min-stack",
-    difficulty: "Medium",
-    pattern: "Stack & Binary Search",
-    frequency: "91%",
-    companies: ["Amazon", "Bloomberg", "Microsoft"],
-    timeComp: "O(1) all operations",
-    spaceComp: "O(N)",
-    intuition: "Maintain a companion minStack or store pairs [value, currentMin] in the primary stack.",
-    pitfalls: "Popping minimum element without updating current min tracking.",
-  },
-  {
-    id: 704,
-    frontendId: 704,
-    title: "Binary Search",
-    titleSlug: "binary-search",
-    difficulty: "Easy",
-    pattern: "Stack & Binary Search",
-    frequency: "95%",
-    companies: ["Apple", "Microsoft", "Google"],
-    timeComp: "O(log N)",
-    spaceComp: "O(1)",
-    intuition: "Divide and conquer: mid = low + Math.floor((high - low) / 2). Eliminate half the remaining search space on every comparison.",
-    pitfalls: "Integer overflow on (low + high) / 2 in languages with fixed integer sizes.",
-  },
-  {
-    id: 33,
-    frontendId: 33,
-    title: "Search in Rotated Sorted Array",
-    titleSlug: "search-in-rotated-sorted-array",
-    difficulty: "Medium",
-    pattern: "Stack & Binary Search",
-    frequency: "97%",
-    companies: ["Meta", "Amazon", "Microsoft", "Google"],
-    timeComp: "O(log N)",
-    spaceComp: "O(1)",
-    intuition: "In any rotated sorted array, at least one half [low..mid] or [mid..high] is always strictly sorted. Determine which half is sorted and check if target lies within it.",
-    pitfalls: "Off-by-one errors with <= versus < when checking bounds.",
-  },
-
-  // Trees & Graphs
-  {
-    id: 226,
-    frontendId: 226,
-    title: "Invert Binary Tree",
-    titleSlug: "invert-binary-tree",
-    difficulty: "Easy",
-    pattern: "Trees & Graphs",
-    frequency: "94%",
-    companies: ["Google", "Amazon", "Meta"],
-    timeComp: "O(N)",
-    spaceComp: "O(H) recursion stack",
-    intuition: "Recursively swap root.left and root.right, then recurse on left and right children.",
-    pitfalls: "Base case: return null if node is null.",
-  },
-  {
-    id: 104,
-    frontendId: 104,
-    title: "Maximum Depth of Binary Tree",
-    titleSlug: "maximum-depth-of-binary-tree",
-    difficulty: "Easy",
-    pattern: "Trees & Graphs",
-    frequency: "93%",
-    companies: ["Amazon", "LinkedIn", "Apple"],
-    timeComp: "O(N)",
-    spaceComp: "O(H)",
-    intuition: "Depth = 1 + max(maxDepth(root.left), maxDepth(root.right)).",
-    pitfalls: "Empty tree depth is 0.",
-  },
-  {
-    id: 200,
-    frontendId: 200,
-    title: "Number of Islands",
-    titleSlug: "number-of-islands",
-    difficulty: "Medium",
-    pattern: "Trees & Graphs",
-    frequency: "99%",
-    companies: ["Amazon", "Google", "Meta", "Bloomberg"],
-    timeComp: "O(R * C)",
-    spaceComp: "O(R * C)",
-    intuition: "Iterate through 2D grid. When encountering '1', increment island count and trigger DFS/BFS to sink/visit all connected '1' cells to '0'.",
-    pitfalls: "Stack overflow on huge grids if using deep recursion without visiting tracking.",
-  },
-  {
-    id: 207,
-    frontendId: 207,
-    title: "Course Schedule",
-    titleSlug: "course-schedule",
-    difficulty: "Medium",
-    pattern: "Trees & Graphs",
-    frequency: "95%",
-    companies: ["Amazon", "Google", "Meta"],
-    timeComp: "O(V + E)",
-    spaceComp: "O(V + E)",
-    intuition: "Topological Sort using Kahn's algorithm (indegrees + BFS) or DFS cycle detection using 3 states (unvisited, visiting, visited).",
-    pitfalls: "Disconnected graph components must all be checked.",
-  },
-
-  // Dynamic Programming
-  {
-    id: 70,
-    frontendId: 70,
-    title: "Climbing Stairs",
-    titleSlug: "climbing-stairs",
-    difficulty: "Easy",
-    pattern: "Dynamic Programming",
-    frequency: "96%",
-    companies: ["Amazon", "Google", "Apple"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Fibonacci recurrence: dp[i] = dp[i-1] + dp[i-2]. Keep only the last two values.",
-    pitfalls: "Base cases n=1 and n=2.",
-  },
-  {
-    id: 322,
-    frontendId: 322,
-    title: "Coin Change",
-    titleSlug: "coin-change",
-    difficulty: "Medium",
-    pattern: "Dynamic Programming",
-    frequency: "97%",
-    companies: ["Amazon", "Google", "Meta", "Microsoft"],
-    timeComp: "O(amount * coins.length)",
-    spaceComp: "O(amount)",
-    intuition: "Bottom-up 1D DP: dp[i] = min(dp[i], 1 + dp[i - coin]) for each coin <= i. Initialize with Infinity.",
-    pitfalls: "Handling impossible amounts (return -1 if dp[amount] === Infinity).",
-  },
-  {
-    id: 300,
-    frontendId: 300,
-    title: "Longest Increasing Subsequence",
-    titleSlug: "longest-increasing-subsequence",
-    difficulty: "Medium",
-    pattern: "Dynamic Programming",
+    pattern: "Arrays & Hashing",
     frequency: "92%",
-    companies: ["Google", "Meta", "Amazon"],
-    timeComp: "O(N log N) with Binary Search Patience Sort, O(N²) standard DP",
-    spaceComp: "O(N)",
-    intuition: "Maintain array 'tails'. For each num, binary search insertion index in tails. If at end, append; else overwrite.",
-    pitfalls: "Subsequence elements do not have to be contiguous.",
-  },
-  // Linked Lists
-  {
-    id: 206,
-    frontendId: 206,
-    title: "Reverse Linked List",
-    titleSlug: "reverse-linked-list",
-    difficulty: "Easy",
-    pattern: "Linked Lists",
-    frequency: "99%",
-    companies: ["Amazon", "Google", "Apple", "Meta"],
+    companies: ["Amazon","Apple","Microsoft"],
     timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Maintain prev (null) and curr (head). In a loop, save next = curr.next, invert pointer curr.next = prev, advance prev = curr and curr = next.",
-    pitfalls: "Losing reference to the remaining list before reversing the forward pointer.",
+    spaceComp: "O(N)",
+    intuition: "Insert elements into a Hash Set. If set.has(val) returns true, an immediate duplicate exists.",
+    pitfalls: "Sorting takes O(N log N) time and O(1) space if memory is strictly constrained.",
     codeSnippets: [
-      {
-        lang: "JavaScript",
-        langSlug: "javascript",
-        code: `function reverseList(head) {
-  let prev = null, curr = head;
-  while (curr) {
-    const next = curr.next;
-    curr.next = prev;
-    prev = curr;
-    curr = next;
-  }
-  return prev;
-}`,
-      },
-      {
-        lang: "Python",
-        langSlug: "python3",
-        code: `class Solution:
-    def reverseList(self, head):
-        prev, curr = None, head
-        while curr:
-            nxt = curr.next
-            curr.next = prev
-            prev = curr
-            curr = nxt
-        return prev`,
-      },
-    ],
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function containsDuplicate(nums) {\n  const seen = new Set();\n  for (const n of nums) {\n    if (seen.has(n)) return true;\n    seen.add(n);\n  }\n  return false;\n}"
+    },
+    {
+        "lang": "Python",
+        "langSlug": "python3",
+        "code": "class Solution:\n    def containsDuplicate(self, nums: list[int]) -> bool:\n        return len(nums) != len(set(nums))"
+    },
+    {
+        "lang": "C++",
+        "langSlug": "cpp",
+        "code": "#include <vector>\n#include <unordered_set>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool containsDuplicate(vector<int>& nums) {\n        unordered_set<int> seen;\n        for (int n : nums) {\n            if (seen.count(n)) return true;\n            seen.insert(n);\n        }\n        return false;\n    }\n};"
+    },
+    {
+        "lang": "Java",
+        "langSlug": "java",
+        "code": "import java.util.HashSet;\nimport java.util.Set;\n\nclass Solution {\n    public boolean containsDuplicate(int[] nums) {\n        Set<Integer> set = new HashSet<>();\n        for (int n : nums) {\n            if (!set.add(n)) return true;\n        }\n        return false;\n    }\n}"
+    },
+    {
+        "lang": "TypeScript",
+        "langSlug": "typescript",
+        "code": "function containsDuplicate(nums: number[]): boolean {\n  return new Set(nums).size !== nums.length;\n}"
+    }
+]
   },
   {
-    id: 21,
-    frontendId: 21,
-    title: "Merge Two Sorted Lists",
-    titleSlug: "merge-two-sorted-lists",
-    difficulty: "Easy",
-    pattern: "Linked Lists",
-    frequency: "98%",
-    companies: ["Amazon", "Microsoft", "Meta", "Google"],
-    timeComp: "O(N + M)",
-    spaceComp: "O(1)",
-    intuition: "Use a dummy head sentinel node. Compare values at list1 and list2, appending the smaller node to tail, and advance that pointer.",
-    pitfalls: "Forgetting to attach the remainder of the non-empty list when the other is exhausted.",
-  },
-  {
-    id: 141,
-    frontendId: 141,
-    title: "Linked List Cycle",
-    titleSlug: "linked-list-cycle",
-    difficulty: "Easy",
-    pattern: "Linked Lists",
-    frequency: "97%",
-    companies: ["Amazon", "Microsoft", "Spotify"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Floyd's Tortoise and Hare: slow pointer advances 1 step, fast advances 2. If they ever intersect, a cycle exists.",
-    pitfalls: "Accessing fast.next.next without verifying fast and fast.next are non-null.",
-  },
-  {
-    id: 19,
-    frontendId: 19,
-    title: "Remove Nth Node From End of List",
-    titleSlug: "remove-nth-node-from-end-of-list",
+    id: 4,
+    frontendId: 238,
+    title: "Product of Array Except Self",
+    titleSlug: "product-of-array-except-self",
     difficulty: "Medium",
-    pattern: "Linked Lists",
-    frequency: "93%",
-    companies: ["Meta", "Amazon", "Apple"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Advance fast pointer n steps ahead. Then move slow and fast simultaneously until fast hits the end. Remove slow.next.",
-    pitfalls: "Handling edge cases where the node to remove is the original head of the list.",
-  },
-  {
-    id: 143,
-    frontendId: 143,
-    title: "Reorder List",
-    titleSlug: "reorder-list",
-    difficulty: "Medium",
-    pattern: "Linked Lists",
-    frequency: "90%",
-    companies: ["Amazon", "Meta"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Find the middle using slow/fast pointers, reverse the second half, and merge the two halves alternately.",
-    pitfalls: "Not severing the end of the first half (creating infinite cycle).",
-  },
-
-  // Intervals
-  {
-    id: 56,
-    frontendId: 56,
-    title: "Merge Intervals",
-    titleSlug: "merge-intervals",
-    difficulty: "Medium",
-    pattern: "Intervals",
-    frequency: "99%",
-    companies: ["Meta", "Google", "Amazon", "Bloomberg"],
-    timeComp: "O(N log N)",
-    spaceComp: "O(N)",
-    intuition: "Sort intervals by start time. Iterate through: if curr.start <= lastMerged.end, merge by updating end = max(last.end, curr.end). Else push new interval.",
-    pitfalls: "Failing to sort intervals first, or forgetting Math.max when merging ends.",
-  },
-  {
-    id: 57,
-    frontendId: 57,
-    title: "Insert Interval",
-    titleSlug: "insert-interval",
-    difficulty: "Medium",
-    pattern: "Intervals",
-    frequency: "95%",
-    companies: ["Google", "Meta", "LinkedIn"],
-    timeComp: "O(N)",
-    spaceComp: "O(N)",
-    intuition: "Linear scan: add all intervals ending before newInterval starts. Then merge all overlapping intervals into newInterval. Finally add remaining.",
-    pitfalls: "Re-sorting array needlessly when linear O(N) pass is optimal.",
-  },
-  {
-    id: 435,
-    frontendId: 435,
-    title: "Non-overlapping Intervals",
-    titleSlug: "non-overlapping-intervals",
-    difficulty: "Medium",
-    pattern: "Intervals",
-    frequency: "88%",
-    companies: ["Meta", "Amazon"],
-    timeComp: "O(N log N)",
-    spaceComp: "O(1)",
-    intuition: "Greedy choice: sort by end times. Keep intervals that finish earliest to leave maximum room for future intervals.",
-    pitfalls: "Sorting by start times requires tracking min of end times on collision.",
-  },
-
-  // Heap & Priority Queue
-  {
-    id: 215,
-    frontendId: 215,
-    title: "Kth Largest Element in an Array",
-    titleSlug: "kth-largest-element-in-an-array",
-    difficulty: "Medium",
-    pattern: "Heap & Priority Queue",
-    frequency: "98%",
-    companies: ["Meta", "Amazon", "Google", "Microsoft"],
-    timeComp: "O(N log K) or O(N) QuickSelect",
-    spaceComp: "O(K)",
-    intuition: "Maintain a Min-Heap of size K. For each element, insert and if size exceeds K, pop smallest. The root is the Kth largest.",
-    pitfalls: "Using Max-Heap with size N requires O(N + K log N) space and time.",
-  },
-  {
-    id: 347,
-    frontendId: 347,
-    title: "Top K Frequent Elements",
-    titleSlug: "top-k-frequent-elements",
-    difficulty: "Medium",
-    pattern: "Heap & Priority Queue",
+    pattern: "Arrays & Hashing",
     frequency: "96%",
-    companies: ["Amazon", "Meta", "Uber"],
-    timeComp: "O(N) with Bucket Sort, O(N log K) with Min-Heap",
-    spaceComp: "O(N)",
-    intuition: "Build frequency map. Group elements into an array of buckets where index is frequency. Traverse buckets backwards from N down to 1.",
-    pitfalls: "Sorting the frequency map costs O(U log U) instead of O(N) bucket sort.",
-  },
-  {
-    id: 295,
-    frontendId: 295,
-    title: "Find Median from Data Stream",
-    titleSlug: "find-median-from-data-stream",
-    difficulty: "Hard",
-    pattern: "Heap & Priority Queue",
-    frequency: "95%",
-    companies: ["Google", "Amazon", "Apple"],
-    timeComp: "O(log N) insert, O(1) find",
-    spaceComp: "O(N)",
-    intuition: "Two heaps: Max-Heap for lower half of numbers, Min-Heap for upper half. Balance sizes so size diff <= 1.",
-    pitfalls: "Maintaining the invariant that all elements in lower half <= all in upper half.",
-  },
-
-  // Matrix
-  {
-    id: 73,
-    frontendId: 73,
-    title: "Set Matrix Zeroes",
-    titleSlug: "set-matrix-zeroes",
-    difficulty: "Medium",
-    pattern: "Matrix",
-    frequency: "94%",
-    companies: ["Amazon", "Microsoft", "Meta"],
-    timeComp: "O(M * N)",
-    spaceComp: "O(1) in-place",
-    intuition: "Use the first row and first column as markers. Track whether the first row/col originally contained zero with two boolean flags.",
-    pitfalls: "Overwriting the first row/col before processing inner cells.",
-  },
-  {
-    id: 54,
-    frontendId: 54,
-    title: "Spiral Matrix",
-    titleSlug: "spiral-matrix",
-    difficulty: "Medium",
-    pattern: "Matrix",
-    frequency: "96%",
-    companies: ["Amazon", "Microsoft", "Apple", "Google"],
-    timeComp: "O(M * N)",
-    spaceComp: "O(1) excluding output",
-    intuition: "Maintain 4 boundaries: top, bottom, left, right. Traverse right, shrink top; traverse down, shrink right; traverse left, shrink bottom; traverse up, shrink left.",
-    pitfalls: "Duplicate traversal on single-row or single-column matrices if boundaries cross mid-loop.",
-  },
-  {
-    id: 48,
-    frontendId: 48,
-    title: "Rotate Image",
-    titleSlug: "rotate-image",
-    difficulty: "Medium",
-    pattern: "Matrix",
-    frequency: "93%",
-    companies: ["Amazon", "Google", "Microsoft"],
-    timeComp: "O(N²)",
-    spaceComp: "O(1) in-place",
-    intuition: "Rotate 90 degrees clockwise = Transpose matrix (swap matrix[i][j] with matrix[j][i]) then reverse each row horizontally.",
-    pitfalls: "Swapping during transpose twice, which cancels out the transposition.",
-  },
-
-  // Trees & Advanced Graphs
-  {
-    id: 98,
-    frontendId: 98,
-    title: "Validate Binary Search Tree",
-    titleSlug: "validate-binary-search-tree",
-    difficulty: "Medium",
-    pattern: "Trees & Graphs",
-    frequency: "97%",
-    companies: ["Amazon", "Meta", "Bloomberg"],
+    companies: ["Amazon","Meta","Apple","Microsoft"],
     timeComp: "O(N)",
-    spaceComp: "O(H)",
-    intuition: "Pass valid ranges (minVal, maxVal) recursively. Left child must be strictly < node.val, right child must be strictly > node.val.",
-    pitfalls: "Only comparing parent to immediate children instead of entire subtree ancestors.",
+    spaceComp: "O(1) [excluding output array]",
+    intuition: "Calculate prefix products in a forward pass, then multiply by suffix products in a backward pass without using the division operator.",
+    pitfalls: "Division by zero traps if using total product / nums[i]. Follow problem constraint: division is forbidden.",
+    codeSnippets: []
   },
   {
-    id: 235,
-    frontendId: 235,
-    title: "Lowest Common Ancestor of a BST",
-    titleSlug: "lowest-common-ancestor-of-a-binary-search-tree",
-    difficulty: "Medium",
-    pattern: "Trees & Graphs",
-    frequency: "94%",
-    companies: ["Amazon", "Meta", "Microsoft"],
-    timeComp: "O(H)",
-    spaceComp: "O(1)",
-    intuition: "In BST, if both p and q are smaller than root, LCA is in left subtree. If both greater, right subtree. The first split point is the LCA.",
-    pitfalls: "Applying general binary tree DFS when BST ordering allows O(1) space iterative search.",
-  },
-  {
-    id: 133,
-    frontendId: 133,
-    title: "Clone Graph",
-    titleSlug: "clone-graph",
-    difficulty: "Medium",
-    pattern: "Trees & Graphs",
-    frequency: "92%",
-    companies: ["Meta", "Amazon", "Google"],
-    timeComp: "O(V + E)",
-    spaceComp: "O(V)",
-    intuition: "Use a Hash Map of original node -> cloned node. Perform DFS/BFS: if neighbor already cloned, reuse reference; otherwise create and recurse.",
-    pitfalls: "Infinite loop in cyclic graphs if visiting tracking is missing.",
-  },
-
-  // Backtracking
-  {
-    id: 78,
-    frontendId: 78,
-    title: "Subsets",
-    titleSlug: "subsets",
-    difficulty: "Medium",
-    pattern: "Backtracking",
-    frequency: "96%",
-    companies: ["Meta", "Amazon", "Google"],
-    timeComp: "O(N * 2^N)",
-    spaceComp: "O(N)",
-    intuition: "Backtracking tree: at each index, candidate has two choices: include nums[i] or exclude. Add current path copy to result on each step.",
-    pitfalls: "Pushing reference to mutable path array instead of a cloned copy [...path].",
-  },
-  {
-    id: 39,
-    frontendId: 39,
-    title: "Combination Sum",
-    titleSlug: "combination-sum",
-    difficulty: "Medium",
-    pattern: "Backtracking",
-    frequency: "95%",
-    companies: ["Amazon", "Meta", "Airbnb"],
-    timeComp: "O(2^Target)",
-    spaceComp: "O(Target)",
-    intuition: "Backtrack with start index and remaining target. Since elements can be reused, recursive step remains on index i instead of advancing to i + 1.",
-    pitfalls: "Duplicate combinations if starting index loop from 0 instead of currIndex.",
-  },
-  {
-    id: 79,
-    frontendId: 79,
-    title: "Word Search",
-    titleSlug: "word-search",
-    difficulty: "Medium",
-    pattern: "Backtracking",
-    frequency: "94%",
-    companies: ["Amazon", "Microsoft", "Bloomberg"],
-    timeComp: "O(M * N * 3^L)",
-    spaceComp: "O(L)",
-    intuition: "DFS with backtracking. Temporarily mark board[r][c] = '#' while exploring 4 directions, then restore character before backtracking.",
-    pitfalls: "Forgetting to restore cell character upon return (corrupting board state).",
-  },
-
-  // Bit Manipulation
-  {
-    id: 191,
-    frontendId: 191,
-    title: "Number of 1 Bits",
-    titleSlug: "number-of-1-bits",
-    difficulty: "Easy",
-    pattern: "Bit Manipulation",
-    frequency: "93%",
-    companies: ["Apple", "Microsoft", "Amazon"],
-    timeComp: "O(k) where k is set bits",
-    spaceComp: "O(1)",
-    intuition: "Brian Kernighan's Algorithm: n = n & (n - 1) flips the lowest set bit to 0. Repeat until n reaches 0.",
-    pitfalls: "Iterating through all 32 bits when only counting set bits.",
-  },
-  {
-    id: 136,
-    frontendId: 136,
-    title: "Single Number",
-    titleSlug: "single-number",
-    difficulty: "Easy",
-    pattern: "Bit Manipulation",
-    frequency: "95%",
-    companies: ["Amazon", "Google", "Meta"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "XOR all numbers together: a ^ a = 0 and a ^ 0 = a. Duplicate numbers cancel each other out, leaving only the unique number.",
-    pitfalls: "Using a hash set which consumes O(N) memory violating the constant space constraint.",
-  },
-,
-  {
-    id: 53,
+    id: 5,
     frontendId: 53,
     title: "Maximum Subarray",
     titleSlug: "maximum-subarray",
@@ -1045,7 +139,7 @@ public:
 ]
   },
   {
-    id: 152,
+    id: 6,
     frontendId: 152,
     title: "Maximum Product Subarray",
     titleSlug: "maximum-product-subarray",
@@ -1066,7 +160,7 @@ public:
 ]
   },
   {
-    id: 153,
+    id: 7,
     frontendId: 153,
     title: "Find Minimum in Rotated Sorted Array",
     titleSlug: "find-minimum-in-rotated-sorted-array",
@@ -1087,406 +181,209 @@ public:
 ]
   },
   {
-    id: 371,
-    frontendId: 371,
-    title: "Sum of Two Integers",
-    titleSlug: "sum-of-two-integers",
+    id: 8,
+    frontendId: 33,
+    title: "Search in Rotated Sorted Array",
+    titleSlug: "search-in-rotated-sorted-array",
     difficulty: "Medium",
-    pattern: "Bit Manipulation",
-    frequency: "85%",
-    companies: ["Facebook","Google"],
-    timeComp: "O(1)",
-    spaceComp: "O(1)",
-    intuition: "XOR (a ^ b) yields the sum without carry. AND shifted left ((a & b) << 1) produces the carry. Repeat until carry is zero.",
-    pitfalls: "In Python/JavaScript, handling 32-bit signed integers and negative numbers with mask 0xFFFFFFFF.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function getSum(a, b) {\n  while (b !== 0) {\n    const carry = (a & b) << 1;\n    a = a ^ b;\n    b = carry;\n  }\n  return a;\n}"
-    }
-]
-  },
-  {
-    id: 338,
-    frontendId: 338,
-    title: "Counting Bits",
-    titleSlug: "counting-bits",
-    difficulty: "Easy",
-    pattern: "Bit Manipulation",
-    frequency: "88%",
-    companies: ["Amazon","Apple"],
-    timeComp: "O(N)",
-    spaceComp: "O(N)",
-    intuition: "DP recurrence: dp[i] = dp[i >> 1] + (i & 1). The number of 1 bits in i is the count in i/2 plus 1 if i is odd.",
-    pitfalls: "Calculating bit counts naively for each number takes O(N log N) instead of linear O(N).",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function countBits(n) {\n  const ans = new Array(n + 1).fill(0);\n  for (let i = 1; i <= n; i++) {\n    ans[i] = ans[i >> 1] + (i & 1);\n  }\n  return ans;\n}"
-    }
-]
-  },
-  {
-    id: 268,
-    frontendId: 268,
-    title: "Missing Number",
-    titleSlug: "missing-number",
-    difficulty: "Easy",
-    pattern: "Bit Manipulation",
-    frequency: "95%",
-    companies: ["Amazon","Microsoft","Meta"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "XOR index 0..n with all numbers in array, or use Gauss formula: expected = n*(n+1)/2 minus sum of nums.",
-    pitfalls: "Integer overflow in Gauss formula if numbers are extremely large (though within 32-bit for LeetCode).",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function missingNumber(nums) {\n  let res = nums.length;\n  for (let i = 0; i < nums.length; i++) {\n    res ^= i ^ nums[i];\n  }\n  return res;\n}"
-    }
-]
-  },
-  {
-    id: 190,
-    frontendId: 190,
-    title: "Reverse Bits",
-    titleSlug: "reverse-bits",
-    difficulty: "Easy",
-    pattern: "Bit Manipulation",
-    frequency: "82%",
-    companies: ["Apple","Airbnb"],
-    timeComp: "O(1)",
-    spaceComp: "O(1)",
-    intuition: "Loop 32 times: shift res left by 1, add (n & 1), and right-shift n by 1.",
-    pitfalls: "JavaScript bitwise operators convert operands to 32-bit signed ints; use >>> 0 to treat result as unsigned.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function reverseBits(n) {\n  let res = 0;\n  for (let i = 0; i < 32; i++) {\n    res = (res << 1) | (n & 1);\n    n >>>= 1;\n  }\n  return res >>> 0;\n}"
-    }
-]
-  },
-  {
-    id: 1143,
-    frontendId: 1143,
-    title: "Longest Common Subsequence",
-    titleSlug: "longest-common-subsequence",
-    difficulty: "Medium",
-    pattern: "Dynamic Programming",
-    frequency: "94%",
-    companies: ["Amazon","Google","Meta"],
-    timeComp: "O(M * N)",
-    spaceComp: "O(M * N)",
-    intuition: "2D DP grid: If text1[i] == text2[j], dp[i][j] = 1 + dp[i-1][j-1]. Otherwise, dp[i][j] = max(dp[i-1][j], dp[i][j-1]).",
-    pitfalls: "Confusing common substring (contiguous) with common subsequence (non-contiguous).",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function longestCommonSubsequence(text1, text2) {\n  const m = text1.length, n = text2.length;\n  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n  for (let i = 1; i <= m; i++) {\n    for (let j = 1; j <= n; j++) {\n      if (text1[i - 1] === text2[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n      else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n    }\n  }\n  return dp[m][n];\n}"
-    }
-]
-  },
-  {
-    id: 139,
-    frontendId: 139,
-    title: "Word Break",
-    titleSlug: "word-break",
-    difficulty: "Medium",
-    pattern: "Dynamic Programming",
-    frequency: "92%",
-    companies: ["Facebook","Amazon","Bloomberg"],
-    timeComp: "O(N^2 * M)",
-    spaceComp: "O(N)",
-    intuition: "dp[i] is true if s[0...i] can be segmented into dictionary words. Check every split j < i where dp[j] is true and s[j...i] is in wordSet.",
-    pitfalls: "Re-scanning wordDict as an array instead of converting to Set for O(1) lookup.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function wordBreak(s, wordDict) {\n  const wordSet = new Set(wordDict);\n  const dp = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (dp[j] && wordSet.has(s.substring(j, i))) {\n        dp[i] = true;\n        break;\n      }\n    }\n  }\n  return dp[s.length];\n}"
-    }
-]
-  },
-  {
-    id: 377,
-    frontendId: 377,
-    title: "Combination Sum IV",
-    titleSlug: "combination-sum-iv",
-    difficulty: "Medium",
-    pattern: "Dynamic Programming",
-    frequency: "84%",
-    companies: ["Google","Facebook"],
-    timeComp: "O(target * N)",
-    spaceComp: "O(target)",
-    intuition: "Permutations of coin change: dp[i] is number of combinations that add to i. dp[i] += dp[i - num] for num in nums if i >= num.",
-    pitfalls: "Order matters here (unlike Coin Change II combinations). The outer loop must iterate targets and inner loop iterate nums.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function combinationSum4(nums, target) {\n  const dp = new Array(target + 1).fill(0);\n  dp[0] = 1;\n  for (let i = 1; i <= target; i++) {\n    for (const num of nums) {\n      if (i >= num) dp[i] += dp[i - num];\n    }\n  }\n  return dp[target];\n}"
-    }
-]
-  },
-  {
-    id: 198,
-    frontendId: 198,
-    title: "House Robber",
-    titleSlug: "house-robber",
-    difficulty: "Medium",
-    pattern: "Dynamic Programming",
-    frequency: "95%",
-    companies: ["Amazon","Google","Microsoft"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "At each house i, rob1 = max loot ending at i-2, rob2 = max loot ending at i-1. New loot = max(rob1 + nums[i], rob2).",
-    pitfalls: "Allocating an O(N) array when only previous 2 values rob1 and rob2 are needed.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function rob(nums) {\n  let rob1 = 0, rob2 = 0;\n  for (const n of nums) {\n    const temp = Math.max(n + rob1, rob2);\n    rob1 = rob2;\n    rob2 = temp;\n  }\n  return rob2;\n}"
-    }
-]
-  },
-  {
-    id: 213,
-    frontendId: 213,
-    title: "House Robber II",
-    titleSlug: "house-robber-ii",
-    difficulty: "Medium",
-    pattern: "Dynamic Programming",
-    frequency: "90%",
-    companies: ["Microsoft","Google"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Since houses are in a circle, either rob houses 0 to n-2 OR rob houses 1 to n-1. Take the max of both runs.",
-    pitfalls: "Edge case with only 1 house: must return nums[0] immediately.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function rob(nums) {\n  if (nums.length === 1) return nums[0];\n  const helper = (arr) => {\n    let r1 = 0, r2 = 0;\n    for (const n of arr) {\n      const temp = Math.max(n + r1, r2);\n      r1 = r2;\n      r2 = temp;\n    }\n    return r2;\n  };\n  return Math.max(helper(nums.slice(0, -1)), helper(nums.slice(1)));\n}"
-    }
-]
-  },
-  {
-    id: 91,
-    frontendId: 91,
-    title: "Decode Ways",
-    titleSlug: "decode-ways",
-    difficulty: "Medium",
-    pattern: "Dynamic Programming",
-    frequency: "93%",
-    companies: ["Facebook","Uber","Google"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "dp[i] represents valid decodings up to index i. Single digit s[i] != '0' contributes dp[i-1]. Two digits s[i-1..i] between 10 and 26 contribute dp[i-2].",
-    pitfalls: "Leading zeros ('06' is invalid) and strings starting with '0'.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function numDecodings(s) {\n  if (!s || s[0] === '0') return 0;\n  let prev2 = 1, prev1 = 1;\n  for (let i = 1; i < s.length; i++) {\n    let cur = 0;\n    const one = parseInt(s[i], 10);\n    const two = parseInt(s.substring(i - 1, i + 1), 10);\n    if (one >= 1 && one <= 9) cur += prev1;\n    if (two >= 10 && two <= 26) cur += prev2;\n    prev2 = prev1;\n    prev1 = cur;\n  }\n  return prev1;\n}"
-    }
-]
-  },
-  {
-    id: 62,
-    frontendId: 62,
-    title: "Unique Paths",
-    titleSlug: "unique-paths",
-    difficulty: "Medium",
-    pattern: "Dynamic Programming",
-    frequency: "92%",
-    companies: ["Amazon","Google","Adobe"],
-    timeComp: "O(M * N)",
-    spaceComp: "O(N)",
-    intuition: "Robot can only move down or right: dp[r][c] = dp[r-1][c] + dp[r][c-1]. Optimize to 1D row array.",
-    pitfalls: "Grid bounds off-by-one errors; initial base case is dp[c] = 1 for all columns in the top row.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function uniquePaths(m, n) {\n  const row = new Array(n).fill(1);\n  for (let i = 1; i < m; i++) {\n    for (let j = 1; j < n; j++) {\n      row[j] += row[j - 1];\n    }\n  }\n  return row[n - 1];\n}"
-    }
-]
-  },
-  {
-    id: 55,
-    frontendId: 55,
-    title: "Jump Game",
-    titleSlug: "jump-game",
-    difficulty: "Medium",
-    pattern: "Greedy",
-    frequency: "94%",
-    companies: ["Amazon","Meta","Microsoft"],
-    timeComp: "O(N)",
-    spaceComp: "O(1)",
-    intuition: "Work backwards from the end: goal = n - 1. If i + nums[i] >= goal, update goal = i. If goal == 0 at the end, true.",
-    pitfalls: "Using exponential or quadratic DP when a single backwards greedy scan solves it in O(N).",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function canJump(nums) {\n  let goal = nums.length - 1;\n  for (let i = nums.length - 2; i >= 0; i--) {\n    if (i + nums[i] >= goal) goal = i;\n  }\n  return goal === 0;\n}"
-    }
-]
-  },
-  {
-    id: 417,
-    frontendId: 417,
-    title: "Pacific Atlantic Water Flow",
-    titleSlug: "pacific-atlantic-water-flow",
-    difficulty: "Medium",
-    pattern: "Graphs",
-    frequency: "88%",
-    companies: ["Google","Amazon"],
-    timeComp: "O(M * N)",
-    spaceComp: "O(M * N)",
-    intuition: "Instead of flowing water down from each cell, flow water uphill from Pacific ocean borders and Atlantic borders using BFS/DFS. Return intersection of reachable sets.",
-    pitfalls: "Re-running DFS from every cell causes TLE. Reverse thinking from ocean edges is required.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function pacificAtlantic(heights) {\n  const m = heights.length, n = heights[0].length;\n  const pac = Array.from({ length: m }, () => new Array(n).fill(false));\n  const atl = Array.from({ length: m }, () => new Array(n).fill(false));\n  const dfs = (r, c, visit, prev) => {\n    if (r < 0 || c < 0 || r >= m || c >= n || visit[r][c] || heights[r][c] < prev) return;\n    visit[r][c] = true;\n    dfs(r + 1, c, visit, heights[r][c]);\n    dfs(r - 1, c, visit, heights[r][c]);\n    dfs(r, c + 1, visit, heights[r][c]);\n    dfs(r, c - 1, visit, heights[r][c]);\n  };\n  for (let i = 0; i < m; i++) {\n    dfs(i, 0, pac, heights[i][0]);\n    dfs(i, n - 1, atl, heights[i][n - 1]);\n  }\n  for (let j = 0; j < n; j++) {\n    dfs(0, j, pac, heights[0][j]);\n    dfs(m - 1, j, atl, heights[m - 1][j]);\n  }\n  const res = [];\n  for (let i = 0; i < m; i++) {\n    for (let j = 0; j < n; j++) {\n      if (pac[i][j] && atl[i][j]) res.push([i, j]);\n    }\n  }\n  return res;\n}"
-    }
-]
-  },
-  {
-    id: 269,
-    frontendId: 269,
-    title: "Alien Dictionary",
-    titleSlug: "alien-dictionary",
-    difficulty: "Hard",
-    pattern: "Graphs",
-    frequency: "85%",
-    companies: ["Facebook","Airbnb","Pinterest"],
-    timeComp: "O(C)",
-    spaceComp: "O(1) (26 letters)",
-    intuition: "Build a DAG by comparing adjacent words to find lexicographical ordering: character differing first gives directed edge u -> v. Run Topological Sort (Kahn's or DFS).",
-    pitfalls: "Prefix invalid case: word1 is longer than word2 and word2 is a prefix of word1 (e.g. ['abc', 'ab']), which is illegal. Cycle in graph = impossible.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function alienOrder(words) {\n  const adj = new Map();\n  const inDegree = new Map();\n  for (const word of words) {\n    for (const c of word) {\n      if (!adj.has(c)) adj.set(c, new Set());\n      if (!inDegree.has(c)) inDegree.set(c, 0);\n    }\n  }\n  for (let i = 0; i < words.length - 1; i++) {\n    const w1 = words[i], w2 = words[i + 1];\n    const minLen = Math.min(w1.length, w2.length);\n    if (w1.length > w2.length && w1.startsWith(w2)) return \"\";\n    for (let j = 0; j < minLen; j++) {\n      if (w1[j] !== w2[j]) {\n        if (!adj.get(w1[j]).has(w2[j])) {\n          adj.get(w1[j]).add(w2[j]);\n          inDegree.set(w2[j], inDegree.get(w2[j]) + 1);\n        }\n        break;\n      }\n    }\n  }\n  const queue = [];\n  for (const [c, deg] of inDegree.entries()) {\n    if (deg === 0) queue.push(c);\n  }\n  let res = \"\";\n  while (queue.length > 0) {\n    const u = queue.shift();\n    res += u;\n    for (const v of adj.get(u)) {\n      inDegree.set(v, inDegree.get(v) - 1);\n      if (inDegree.get(v) === 0) queue.push(v);\n    }\n  }\n  return res.length === inDegree.size ? res : \"\";\n}"
-    }
-]
-  },
-  {
-    id: 261,
-    frontendId: 261,
-    title: "Graph Valid Tree",
-    titleSlug: "graph-valid-tree",
-    difficulty: "Medium",
-    pattern: "Graphs",
-    frequency: "86%",
-    companies: ["Google","Facebook"],
-    timeComp: "O(V + E)",
-    spaceComp: "O(V + E)",
-    intuition: "A graph is a valid tree iff it has exactly n - 1 edges and is fully connected (no cycles). Check with Union-Find or BFS.",
-    pitfalls: "If edges.length !== n - 1, it cannot be a tree (either has cycles or is disconnected).",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function validTree(n, edges) {\n  if (edges.length !== n - 1) return false;\n  const parent = Array.from({ length: n }, (_, i) => i);\n  const find = (i) => parent[i] === i ? i : (parent[i] = find(parent[i]));\n  for (const [u, v] of edges) {\n    const rootU = find(u), rootV = find(v);\n    if (rootU === rootV) return false;\n    parent[rootU] = rootV;\n  }\n  return true;\n}"
-    }
-]
-  },
-  {
-    id: 323,
-    frontendId: 323,
-    title: "Number of Connected Components in an Undirected Graph",
-    titleSlug: "number-of-connected-components-in-an-undirected-graph",
-    difficulty: "Medium",
-    pattern: "Graphs",
-    frequency: "84%",
-    companies: ["Amazon","Twitter","Google"],
-    timeComp: "O(V + E)",
-    spaceComp: "O(V)",
-    intuition: "Start with n components. Use Disjoint Set Union (DSU): whenever an edge successfully merges two disjoint sets, decrement components count by 1.",
-    pitfalls: "Not flattening trees via path compression can lead to degraded DSU runtime.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function countComponents(n, edges) {\n  const parent = Array.from({ length: n }, (_, i) => i);\n  let count = n;\n  const find = (i) => parent[i] === i ? i : (parent[i] = find(parent[i]));\n  for (const [u, v] of edges) {\n    const r1 = find(u), r2 = find(v);\n    if (r1 !== r2) {\n      parent[r1] = r2;\n      count--;\n    }\n  }\n  return count;\n}"
-    }
-]
-  },
-  {
-    id: 252,
-    frontendId: 252,
-    title: "Meeting Rooms",
-    titleSlug: "meeting-rooms",
-    difficulty: "Easy",
-    pattern: "Intervals",
-    frequency: "90%",
-    companies: ["Facebook","Amazon","Google"],
-    timeComp: "O(N log N)",
-    spaceComp: "O(1)",
-    intuition: "Sort meetings by start time. If intervals[i][0] < intervals[i - 1][1], there is an overlap so a person cannot attend all meetings.",
-    pitfalls: "Touching endpoints (e.g. [0, 30] and [30, 40]) do not overlap.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function canAttendMeetings(intervals) {\n  intervals.sort((a, b) => a[0] - b[0]);\n  for (let i = 1; i < intervals.length; i++) {\n    if (intervals[i][0] < intervals[i - 1][1]) return false;\n  }\n  return true;\n}"
-    }
-]
-  },
-  {
-    id: 253,
-    frontendId: 253,
-    title: "Meeting Rooms II",
-    titleSlug: "meeting-rooms-ii",
-    difficulty: "Medium",
-    pattern: "Intervals",
-    frequency: "96%",
-    companies: ["Amazon","Bloomberg","Google","Facebook"],
-    timeComp: "O(N log N)",
-    spaceComp: "O(N)",
-    intuition: "Chronological Ordering: Extract all start and end times into two sorted arrays. Iterate starts: if start < end, need new room. Else reuse room and advance end pointer.",
-    pitfalls: "Attempting brute force O(N^2) interval comparisons instead of two-pointer sweep-line.",
-    codeSnippets: [
-    {
-        "lang": "JavaScript",
-        "langSlug": "javascript",
-        "code": "function minMeetingRooms(intervals) {\n  const starts = intervals.map(i => i[0]).sort((a, b) => a - b);\n  const ends = intervals.map(i => i[1]).sort((a, b) => a - b);\n  let rooms = 0, endIdx = 0;\n  for (let i = 0; i < starts.length; i++) {\n    if (starts[i] < ends[endIdx]) {\n      rooms++;\n    } else {\n      endIdx++;\n    }\n  }\n  return rooms;\n}"
-    }
-]
-  },
-  {
-    id: 23,
-    frontendId: 23,
-    title: "Merge k Sorted Lists",
-    titleSlug: "merge-k-sorted-lists",
-    difficulty: "Hard",
-    pattern: "Linked List",
+    pattern: "Stack & Binary Search",
     frequency: "97%",
-    companies: ["Amazon","Meta","Google","Microsoft"],
-    timeComp: "O(N log K)",
+    companies: ["Meta","Amazon","Microsoft","Google"],
+    timeComp: "O(log N)",
     spaceComp: "O(1)",
-    intuition: "Divide and Conquer: Pairwise merge lists like merge sort until only 1 list remains, or use a Min-Heap of size K.",
-    pitfalls: "Merging lists one-by-one sequentially is slow: O(K * N) instead of O(N log K).",
+    intuition: "In any rotated sorted array, at least one half [low..mid] or [mid..high] is always strictly sorted. Determine which half is sorted and check if target lies within it.",
+    pitfalls: "Off-by-one errors with <= versus < when checking bounds.",
+    codeSnippets: []
+  },
+  {
+    id: 9,
+    frontendId: 15,
+    title: "3Sum",
+    titleSlug: "3sum",
+    difficulty: "Medium",
+    pattern: "Two Pointers",
+    frequency: "98%",
+    companies: ["Meta","Amazon","Apple","Google"],
+    timeComp: "O(N²)",
+    spaceComp: "O(1) or O(N)",
+    intuition: "Sort array first. Fix element i, then use two pointers (left & right) to find pairs summing to -nums[i]. Skip duplicates.",
+    pitfalls: "Duplicate triplets! Ensure you skip identical values after advancing both pointers.",
+    codeSnippets: []
+  },
+  {
+    id: 10,
+    frontendId: 11,
+    title: "Container With Most Water",
+    titleSlug: "container-with-most-water",
+    difficulty: "Medium",
+    pattern: "Two Pointers",
+    frequency: "94%",
+    companies: ["Google","Amazon","Meta"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Start pointers at both ends. Compute area = min(h[l], h[r]) * (r - l). Always advance the pointer pointing to the shorter vertical bar.",
+    pitfalls: "Moving the taller pointer cannot possibly produce a larger area since width shrinks.",
+    codeSnippets: []
+  },
+  {
+    id: 11,
+    frontendId: 3,
+    title: "Longest Substring Without Repeating Characters",
+    titleSlug: "longest-substring-without-repeating-characters",
+    difficulty: "Medium",
+    pattern: "Sliding Window",
+    frequency: "98%",
+    companies: ["Amazon","Microsoft","Meta","Google"],
+    timeComp: "O(N)",
+    spaceComp: "O(min(N, M))",
+    intuition: "Sliding window with two pointers [l, r]. Use a Map of char -> lastIndex. If duplicate seen at or after l, jump l to lastIndex + 1.",
+    pitfalls: "Updating left pointer to an old index behind current left window position.",
+    codeSnippets: []
+  },
+  {
+    id: 12,
+    frontendId: 424,
+    title: "Longest Repeating Character Replacement",
+    titleSlug: "longest-repeating-character-replacement",
+    difficulty: "Medium",
+    pattern: "Sliding Window",
+    frequency: "87%",
+    companies: ["Google","Uber","Amazon"],
+    timeComp: "O(N)",
+    spaceComp: "O(26)",
+    intuition: "Window is valid if (windowLength - maxCharFrequency) <= k. If invalid, shrink from left.",
+    pitfalls: "Do not recompute maxCharFrequency from scratch on every shrink; maintaining historical max works.",
+    codeSnippets: []
+  },
+  {
+    id: 13,
+    frontendId: 76,
+    title: "Minimum Window Substring",
+    titleSlug: "minimum-window-substring",
+    difficulty: "Hard",
+    pattern: "Sliding Window",
+    frequency: "93%",
+    companies: ["Meta","Amazon","LinkedIn","Google"],
+    timeComp: "O(N + M)",
+    spaceComp: "O(1) [ASCII]",
+    intuition: "Expand right until window contains all target characters. Then shrink from left while maintaining validity to find minimum window.",
+    pitfalls: "Comparing frequency maps vs maintaining a 'matched count' counter variable for O(1) checks.",
+    codeSnippets: []
+  },
+  {
+    id: 14,
+    frontendId: 242,
+    title: "Valid Anagram",
+    titleSlug: "valid-anagram",
+    difficulty: "Easy",
+    pattern: "Arrays & Hashing",
+    frequency: "88%",
+    companies: ["Meta","Bloomberg","Amazon"],
+    timeComp: "O(N)",
+    spaceComp: "O(1) [26 alphabet letters]",
+    intuition: "Count character frequencies using an array of size 26 or a hash map. Both strings must have matching counts.",
+    pitfalls: "Verify whether inputs contain non-ASCII Unicode characters before fixing buffer size to 26.",
     codeSnippets: [
     {
         "lang": "JavaScript",
         "langSlug": "javascript",
-        "code": "function mergeKLists(lists) {\n  if (!lists || lists.length === 0) return null;\n  const mergeTwo = (l1, l2) => {\n    const dummy = { next: null };\n    let cur = dummy;\n    while (l1 && l2) {\n      if (l1.val <= l2.val) { cur.next = l1; l1 = l1.next; }\n      else { cur.next = l2; l2 = l2.next; }\n      cur = cur.next;\n    }\n    cur.next = l1 || l2;\n    return dummy.next;\n  };\n  while (lists.length > 1) {\n    const merged = [];\n    for (let i = 0; i < lists.length; i += 2) {\n      merged.push(i + 1 < lists.length ? mergeTwo(lists[i], lists[i + 1]) : lists[i]);\n    }\n    lists = merged;\n  }\n  return lists[0];\n}"
+        "code": "function isAnagram(s, t) {\n  if (s.length !== t.length) return false;\n  const count = {};\n  for (const c of s) count[c] = (count[c] || 0) + 1;\n  for (const c of t) {\n    if (!count[c]) return false;\n    count[c]--;\n  }\n  return true;\n}"
+    },
+    {
+        "lang": "Python",
+        "langSlug": "python3",
+        "code": "from collections import Counter\n\nclass Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        return Counter(s) == Counter(t)"
+    },
+    {
+        "lang": "C++",
+        "langSlug": "cpp",
+        "code": "#include <string>\n#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isAnagram(string s, string t) {\n        if (s.length() != t.length()) return false;\n        vector<int> counts(26, 0);\n        for (char c : s) counts[c - 'a']++;\n        for (char c : t) {\n            if (--counts[c - 'a'] < 0) return false;\n        }\n        return true;\n    }\n};"
+    },
+    {
+        "lang": "Java",
+        "langSlug": "java",
+        "code": "class Solution {\n    public boolean isAnagram(String s, String t) {\n        if (s.length() != t.length()) return false;\n        int[] counts = new int[26];\n        for (char c : s.toCharArray()) counts[c - 'a']++;\n        for (char c : t.toCharArray()) {\n            if (--counts[c - 'a'] < 0) return false;\n        }\n        return true;\n    }\n}"
+    },
+    {
+        "lang": "TypeScript",
+        "langSlug": "typescript",
+        "code": "function isAnagram(s: string, t: string): boolean {\n  if (s.length !== t.length) return false;\n  const count: Record<string, number> = {};\n  for (const c of s) count[c] = (count[c] || 0) + 1;\n  for (const c of t) {\n    if (!count[c]) return false;\n    count[c]--;\n  }\n  return true;\n}"
     }
 ]
   },
   {
-    id: 5,
+    id: 15,
+    frontendId: 49,
+    title: "Group Anagrams",
+    titleSlug: "group-anagrams",
+    difficulty: "Medium",
+    pattern: "Arrays & Hashing",
+    frequency: "95%",
+    companies: ["Amazon","Meta","Google"],
+    timeComp: "O(N * K log K) or O(N * K)",
+    spaceComp: "O(N * K)",
+    intuition: "Use sorted string representation or a 26-char frequency tuple as the dictionary key to group words.",
+    pitfalls: "Creating string keys must be consistent across differing languages.",
+    codeSnippets: []
+  },
+  {
+    id: 16,
+    frontendId: 20,
+    title: "Valid Parentheses",
+    titleSlug: "valid-parentheses",
+    difficulty: "Easy",
+    pattern: "Stack & Binary Search",
+    frequency: "98%",
+    companies: ["Meta","Amazon","Google","Microsoft"],
+    timeComp: "O(N)",
+    spaceComp: "O(N)",
+    intuition: "Push opening brackets to stack. For closing brackets, pop and verify matching opening bracket type. Stack must be empty at end.",
+    pitfalls: "Popping from an empty stack or ending with leftover unmatched opening brackets.",
+    codeSnippets: []
+  },
+  {
+    id: 17,
+    frontendId: 125,
+    title: "Valid Palindrome",
+    titleSlug: "valid-palindrome",
+    difficulty: "Easy",
+    pattern: "Two Pointers",
+    frequency: "89%",
+    companies: ["Meta","Microsoft","Uber"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Use left and right pointers moving inward, skipping non-alphanumeric characters and comparing lowercase chars.",
+    pitfalls: "Ignoring non-alphanumeric punctuation and case-sensitivity.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, \"\");\n  let l = 0, r = clean.length - 1;\n  while (l < r) {\n    if (clean[l] !== clean[r]) return false;\n    l++;\n    r--;\n  }\n  return true;\n}"
+    },
+    {
+        "lang": "Python",
+        "langSlug": "python3",
+        "code": "class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        clean = [c.lower() for c in s if c.isalnum()]\n        return clean == clean[::-1]"
+    },
+    {
+        "lang": "C++",
+        "langSlug": "cpp",
+        "code": "#include <string>\n#include <cctype>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isPalindrome(string s) {\n        int l = 0, r = s.size() - 1;\n        while (l < r) {\n            while (l < r && !isalnum(s[l])) l++;\n            while (l < r && !isalnum(s[r])) r--;\n            if (tolower(s[l]) != tolower(s[r])) return false;\n            l++;\n            r--;\n        }\n        return true;\n    }\n};"
+    },
+    {
+        "lang": "Java",
+        "langSlug": "java",
+        "code": "class Solution {\n    public boolean isPalindrome(String s) {\n        int l = 0, r = s.length() - 1;\n        while (l < r) {\n            while (l < r && !Character.isLetterOrDigit(s.charAt(l))) l++;\n            while (l < r && !Character.isLetterOrDigit(s.charAt(r))) r--;\n            if (Character.toLowerCase(s.charAt(l)) != Character.toLowerCase(s.charAt(r))) return false;\n            l++;\n            r--;\n        }\n        return true;\n    }\n}"
+    },
+    {
+        "lang": "TypeScript",
+        "langSlug": "typescript",
+        "code": "function isPalindrome(s: string): boolean {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, \"\");\n  let l = 0, r = clean.length - 1;\n  while (l < r) {\n    if (clean[l] !== clean[r]) return false;\n    l++;\n    r--;\n  }\n  return true;\n}"
+    }
+]
+  },
+  {
+    id: 18,
     frontendId: 5,
     title: "Longest Palindromic Substring",
     titleSlug: "longest-palindromic-substring",
@@ -1507,7 +404,7 @@ public:
 ]
   },
   {
-    id: 647,
+    id: 19,
     frontendId: 647,
     title: "Palindromic Substrings",
     titleSlug: "palindromic-substrings",
@@ -1528,7 +425,7 @@ public:
 ]
   },
   {
-    id: 271,
+    id: 20,
     frontendId: 271,
     title: "Encode and Decode Strings",
     titleSlug: "encode-and-decode-strings",
@@ -1549,7 +446,129 @@ public:
 ]
   },
   {
-    id: 100,
+    id: 21,
+    frontendId: 206,
+    title: "Reverse Linked List",
+    titleSlug: "reverse-linked-list",
+    difficulty: "Easy",
+    pattern: "Linked Lists",
+    frequency: "99%",
+    companies: ["Amazon","Google","Apple","Meta"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Maintain prev (null) and curr (head). In a loop, save next = curr.next, invert pointer curr.next = prev, advance prev = curr and curr = next.",
+    pitfalls: "Losing reference to the remaining list before reversing the forward pointer.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function reverseList(head) {\n  let prev = null, curr = head;\n  while (curr) {\n    const next = curr.next;\n    curr.next = prev;\n    prev = curr;\n    curr = next;\n  }\n  return prev;\n}"
+    },
+    {
+        "lang": "Python",
+        "langSlug": "python3",
+        "code": "class Solution:\n    def reverseList(self, head):\n        prev, curr = None, head\n        while curr:\n            nxt = curr.next\n            curr.next = prev\n            prev = curr\n            curr = nxt\n        return prev"
+    }
+]
+  },
+  {
+    id: 22,
+    frontendId: 141,
+    title: "Linked List Cycle",
+    titleSlug: "linked-list-cycle",
+    difficulty: "Easy",
+    pattern: "Linked Lists",
+    frequency: "97%",
+    companies: ["Amazon","Microsoft","Spotify"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Floyd's Tortoise and Hare: slow pointer advances 1 step, fast advances 2. If they ever intersect, a cycle exists.",
+    pitfalls: "Accessing fast.next.next without verifying fast and fast.next are non-null.",
+    codeSnippets: []
+  },
+  {
+    id: 23,
+    frontendId: 21,
+    title: "Merge Two Sorted Lists",
+    titleSlug: "merge-two-sorted-lists",
+    difficulty: "Easy",
+    pattern: "Linked Lists",
+    frequency: "98%",
+    companies: ["Amazon","Microsoft","Meta","Google"],
+    timeComp: "O(N + M)",
+    spaceComp: "O(1)",
+    intuition: "Use a dummy head sentinel node. Compare values at list1 and list2, appending the smaller node to tail, and advance that pointer.",
+    pitfalls: "Forgetting to attach the remainder of the non-empty list when the other is exhausted.",
+    codeSnippets: []
+  },
+  {
+    id: 24,
+    frontendId: 23,
+    title: "Merge k Sorted Lists",
+    titleSlug: "merge-k-sorted-lists",
+    difficulty: "Hard",
+    pattern: "Linked List",
+    frequency: "97%",
+    companies: ["Amazon","Meta","Google","Microsoft"],
+    timeComp: "O(N log K)",
+    spaceComp: "O(1)",
+    intuition: "Divide and Conquer: Pairwise merge lists like merge sort until only 1 list remains, or use a Min-Heap of size K.",
+    pitfalls: "Merging lists one-by-one sequentially is slow: O(K * N) instead of O(N log K).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function mergeKLists(lists) {\n  if (!lists || lists.length === 0) return null;\n  const mergeTwo = (l1, l2) => {\n    const dummy = { next: null };\n    let cur = dummy;\n    while (l1 && l2) {\n      if (l1.val <= l2.val) { cur.next = l1; l1 = l1.next; }\n      else { cur.next = l2; l2 = l2.next; }\n      cur = cur.next;\n    }\n    cur.next = l1 || l2;\n    return dummy.next;\n  };\n  while (lists.length > 1) {\n    const merged = [];\n    for (let i = 0; i < lists.length; i += 2) {\n      merged.push(i + 1 < lists.length ? mergeTwo(lists[i], lists[i + 1]) : lists[i]);\n    }\n    lists = merged;\n  }\n  return lists[0];\n}"
+    }
+]
+  },
+  {
+    id: 25,
+    frontendId: 19,
+    title: "Remove Nth Node From End of List",
+    titleSlug: "remove-nth-node-from-end-of-list",
+    difficulty: "Medium",
+    pattern: "Linked Lists",
+    frequency: "93%",
+    companies: ["Meta","Amazon","Apple"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Advance fast pointer n steps ahead. Then move slow and fast simultaneously until fast hits the end. Remove slow.next.",
+    pitfalls: "Handling edge cases where the node to remove is the original head of the list.",
+    codeSnippets: []
+  },
+  {
+    id: 26,
+    frontendId: 143,
+    title: "Reorder List",
+    titleSlug: "reorder-list",
+    difficulty: "Medium",
+    pattern: "Linked Lists",
+    frequency: "90%",
+    companies: ["Amazon","Meta"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Find the middle using slow/fast pointers, reverse the second half, and merge the two halves alternately.",
+    pitfalls: "Not severing the end of the first half (creating infinite cycle).",
+    codeSnippets: []
+  },
+  {
+    id: 27,
+    frontendId: 104,
+    title: "Maximum Depth of Binary Tree",
+    titleSlug: "maximum-depth-of-binary-tree",
+    difficulty: "Easy",
+    pattern: "Trees & Graphs",
+    frequency: "93%",
+    companies: ["Amazon","LinkedIn","Apple"],
+    timeComp: "O(N)",
+    spaceComp: "O(H)",
+    intuition: "Depth = 1 + max(maxDepth(root.left), maxDepth(root.right)).",
+    pitfalls: "Empty tree depth is 0.",
+    codeSnippets: []
+  },
+  {
+    id: 28,
     frontendId: 100,
     title: "Same Tree",
     titleSlug: "same-tree",
@@ -1570,7 +589,22 @@ public:
 ]
   },
   {
-    id: 124,
+    id: 29,
+    frontendId: 226,
+    title: "Invert Binary Tree",
+    titleSlug: "invert-binary-tree",
+    difficulty: "Easy",
+    pattern: "Trees & Graphs",
+    frequency: "94%",
+    companies: ["Google","Amazon","Meta"],
+    timeComp: "O(N)",
+    spaceComp: "O(H) recursion stack",
+    intuition: "Recursively swap root.left and root.right, then recurse on left and right children.",
+    pitfalls: "Base case: return null if node is null.",
+    codeSnippets: []
+  },
+  {
+    id: 30,
     frontendId: 124,
     title: "Binary Tree Maximum Path Sum",
     titleSlug: "binary-tree-maximum-path-sum",
@@ -1591,7 +625,7 @@ public:
 ]
   },
   {
-    id: 102,
+    id: 31,
     frontendId: 102,
     title: "Binary Tree Level Order Traversal",
     titleSlug: "binary-tree-level-order-traversal",
@@ -1612,7 +646,7 @@ public:
 ]
   },
   {
-    id: 297,
+    id: 32,
     frontendId: 297,
     title: "Serialize and Deserialize Binary Tree",
     titleSlug: "serialize-and-deserialize-binary-tree",
@@ -1633,7 +667,7 @@ public:
 ]
   },
   {
-    id: 572,
+    id: 33,
     frontendId: 572,
     title: "Subtree of Another Tree",
     titleSlug: "subtree-of-another-tree",
@@ -1654,7 +688,7 @@ public:
 ]
   },
   {
-    id: 105,
+    id: 34,
     frontendId: 105,
     title: "Construct Binary Tree from Preorder and Inorder Traversal",
     titleSlug: "construct-binary-tree-from-preorder-and-inorder-traversal",
@@ -1675,7 +709,22 @@ public:
 ]
   },
   {
-    id: 230,
+    id: 35,
+    frontendId: 98,
+    title: "Validate Binary Search Tree",
+    titleSlug: "validate-binary-search-tree",
+    difficulty: "Medium",
+    pattern: "Trees & Graphs",
+    frequency: "97%",
+    companies: ["Amazon","Meta","Bloomberg"],
+    timeComp: "O(N)",
+    spaceComp: "O(H)",
+    intuition: "Pass valid ranges (minVal, maxVal) recursively. Left child must be strictly < node.val, right child must be strictly > node.val.",
+    pitfalls: "Only comparing parent to immediate children instead of entire subtree ancestors.",
+    codeSnippets: []
+  },
+  {
+    id: 36,
     frontendId: 230,
     title: "Kth Smallest Element in a BST",
     titleSlug: "kth-smallest-element-in-a-bst",
@@ -1696,7 +745,22 @@ public:
 ]
   },
   {
-    id: 208,
+    id: 37,
+    frontendId: 235,
+    title: "Lowest Common Ancestor of a BST",
+    titleSlug: "lowest-common-ancestor-of-a-binary-search-tree",
+    difficulty: "Medium",
+    pattern: "Trees & Graphs",
+    frequency: "94%",
+    companies: ["Amazon","Meta","Microsoft"],
+    timeComp: "O(H)",
+    spaceComp: "O(1)",
+    intuition: "In BST, if both p and q are smaller than root, LCA is in left subtree. If both greater, right subtree. The first split point is the LCA.",
+    pitfalls: "Applying general binary tree DFS when BST ordering allows O(1) space iterative search.",
+    codeSnippets: []
+  },
+  {
+    id: 38,
     frontendId: 208,
     title: "Implement Trie (Prefix Tree)",
     titleSlug: "implement-trie-prefix-tree",
@@ -1717,7 +781,7 @@ public:
 ]
   },
   {
-    id: 211,
+    id: 39,
     frontendId: 211,
     title: "Design Add and Search Words Data Structure",
     titleSlug: "design-add-and-search-words-data-structure",
@@ -1738,7 +802,7 @@ public:
 ]
   },
   {
-    id: 212,
+    id: 40,
     frontendId: 212,
     title: "Word Search II",
     titleSlug: "word-search-ii",
@@ -1758,6 +822,639 @@ public:
     }
 ]
   },
+  {
+    id: 41,
+    frontendId: 347,
+    title: "Top K Frequent Elements",
+    titleSlug: "top-k-frequent-elements",
+    difficulty: "Medium",
+    pattern: "Heap & Priority Queue",
+    frequency: "96%",
+    companies: ["Amazon","Meta","Uber"],
+    timeComp: "O(N) with Bucket Sort, O(N log K) with Min-Heap",
+    spaceComp: "O(N)",
+    intuition: "Build frequency map. Group elements into an array of buckets where index is frequency. Traverse buckets backwards from N down to 1.",
+    pitfalls: "Sorting the frequency map costs O(U log U) instead of O(N) bucket sort.",
+    codeSnippets: []
+  },
+  {
+    id: 42,
+    frontendId: 295,
+    title: "Find Median from Data Stream",
+    titleSlug: "find-median-from-data-stream",
+    difficulty: "Hard",
+    pattern: "Heap & Priority Queue",
+    frequency: "95%",
+    companies: ["Google","Amazon","Apple"],
+    timeComp: "O(log N) insert, O(1) find",
+    spaceComp: "O(N)",
+    intuition: "Two heaps: Max-Heap for lower half of numbers, Min-Heap for upper half. Balance sizes so size diff <= 1.",
+    pitfalls: "Maintaining the invariant that all elements in lower half <= all in upper half.",
+    codeSnippets: []
+  },
+  {
+    id: 43,
+    frontendId: 70,
+    title: "Climbing Stairs",
+    titleSlug: "climbing-stairs",
+    difficulty: "Easy",
+    pattern: "Dynamic Programming",
+    frequency: "96%",
+    companies: ["Amazon","Google","Apple"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Fibonacci recurrence: dp[i] = dp[i-1] + dp[i-2]. Keep only the last two values.",
+    pitfalls: "Base cases n=1 and n=2.",
+    codeSnippets: []
+  },
+  {
+    id: 44,
+    frontendId: 322,
+    title: "Coin Change",
+    titleSlug: "coin-change",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "97%",
+    companies: ["Amazon","Google","Meta","Microsoft"],
+    timeComp: "O(amount * coins.length)",
+    spaceComp: "O(amount)",
+    intuition: "Bottom-up 1D DP: dp[i] = min(dp[i], 1 + dp[i - coin]) for each coin <= i. Initialize with Infinity.",
+    pitfalls: "Handling impossible amounts (return -1 if dp[amount] === Infinity).",
+    codeSnippets: []
+  },
+  {
+    id: 45,
+    frontendId: 300,
+    title: "Longest Increasing Subsequence",
+    titleSlug: "longest-increasing-subsequence",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "92%",
+    companies: ["Google","Meta","Amazon"],
+    timeComp: "O(N log N) with Binary Search Patience Sort, O(N²) standard DP",
+    spaceComp: "O(N)",
+    intuition: "Maintain array 'tails'. For each num, binary search insertion index in tails. If at end, append; else overwrite.",
+    pitfalls: "Subsequence elements do not have to be contiguous.",
+    codeSnippets: []
+  },
+  {
+    id: 46,
+    frontendId: 1143,
+    title: "Longest Common Subsequence",
+    titleSlug: "longest-common-subsequence",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "94%",
+    companies: ["Amazon","Google","Meta"],
+    timeComp: "O(M * N)",
+    spaceComp: "O(M * N)",
+    intuition: "2D DP grid: If text1[i] == text2[j], dp[i][j] = 1 + dp[i-1][j-1]. Otherwise, dp[i][j] = max(dp[i-1][j], dp[i][j-1]).",
+    pitfalls: "Confusing common substring (contiguous) with common subsequence (non-contiguous).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function longestCommonSubsequence(text1, text2) {\n  const m = text1.length, n = text2.length;\n  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n  for (let i = 1; i <= m; i++) {\n    for (let j = 1; j <= n; j++) {\n      if (text1[i - 1] === text2[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n      else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n    }\n  }\n  return dp[m][n];\n}"
+    }
+]
+  },
+  {
+    id: 47,
+    frontendId: 139,
+    title: "Word Break",
+    titleSlug: "word-break",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "92%",
+    companies: ["Facebook","Amazon","Bloomberg"],
+    timeComp: "O(N^2 * M)",
+    spaceComp: "O(N)",
+    intuition: "dp[i] is true if s[0...i] can be segmented into dictionary words. Check every split j < i where dp[j] is true and s[j...i] is in wordSet.",
+    pitfalls: "Re-scanning wordDict as an array instead of converting to Set for O(1) lookup.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function wordBreak(s, wordDict) {\n  const wordSet = new Set(wordDict);\n  const dp = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (dp[j] && wordSet.has(s.substring(j, i))) {\n        dp[i] = true;\n        break;\n      }\n    }\n  }\n  return dp[s.length];\n}"
+    }
+]
+  },
+  {
+    id: 48,
+    frontendId: 377,
+    title: "Combination Sum IV",
+    titleSlug: "combination-sum-iv",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "84%",
+    companies: ["Google","Facebook"],
+    timeComp: "O(target * N)",
+    spaceComp: "O(target)",
+    intuition: "Permutations of coin change: dp[i] is number of combinations that add to i. dp[i] += dp[i - num] for num in nums if i >= num.",
+    pitfalls: "Order matters here (unlike Coin Change II combinations). The outer loop must iterate targets and inner loop iterate nums.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function combinationSum4(nums, target) {\n  const dp = new Array(target + 1).fill(0);\n  dp[0] = 1;\n  for (let i = 1; i <= target; i++) {\n    for (const num of nums) {\n      if (i >= num) dp[i] += dp[i - num];\n    }\n  }\n  return dp[target];\n}"
+    }
+]
+  },
+  {
+    id: 49,
+    frontendId: 198,
+    title: "House Robber",
+    titleSlug: "house-robber",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "95%",
+    companies: ["Amazon","Google","Microsoft"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "At each house i, rob1 = max loot ending at i-2, rob2 = max loot ending at i-1. New loot = max(rob1 + nums[i], rob2).",
+    pitfalls: "Allocating an O(N) array when only previous 2 values rob1 and rob2 are needed.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function rob(nums) {\n  let rob1 = 0, rob2 = 0;\n  for (const n of nums) {\n    const temp = Math.max(n + rob1, rob2);\n    rob1 = rob2;\n    rob2 = temp;\n  }\n  return rob2;\n}"
+    }
+]
+  },
+  {
+    id: 50,
+    frontendId: 213,
+    title: "House Robber II",
+    titleSlug: "house-robber-ii",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "90%",
+    companies: ["Microsoft","Google"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Since houses are in a circle, either rob houses 0 to n-2 OR rob houses 1 to n-1. Take the max of both runs.",
+    pitfalls: "Edge case with only 1 house: must return nums[0] immediately.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function rob(nums) {\n  if (nums.length === 1) return nums[0];\n  const helper = (arr) => {\n    let r1 = 0, r2 = 0;\n    for (const n of arr) {\n      const temp = Math.max(n + r1, r2);\n      r1 = r2;\n      r2 = temp;\n    }\n    return r2;\n  };\n  return Math.max(helper(nums.slice(0, -1)), helper(nums.slice(1)));\n}"
+    }
+]
+  },
+  {
+    id: 51,
+    frontendId: 91,
+    title: "Decode Ways",
+    titleSlug: "decode-ways",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "93%",
+    companies: ["Facebook","Uber","Google"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "dp[i] represents valid decodings up to index i. Single digit s[i] != '0' contributes dp[i-1]. Two digits s[i-1..i] between 10 and 26 contribute dp[i-2].",
+    pitfalls: "Leading zeros ('06' is invalid) and strings starting with '0'.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function numDecodings(s) {\n  if (!s || s[0] === '0') return 0;\n  let prev2 = 1, prev1 = 1;\n  for (let i = 1; i < s.length; i++) {\n    let cur = 0;\n    const one = parseInt(s[i], 10);\n    const two = parseInt(s.substring(i - 1, i + 1), 10);\n    if (one >= 1 && one <= 9) cur += prev1;\n    if (two >= 10 && two <= 26) cur += prev2;\n    prev2 = prev1;\n    prev1 = cur;\n  }\n  return prev1;\n}"
+    }
+]
+  },
+  {
+    id: 52,
+    frontendId: 62,
+    title: "Unique Paths",
+    titleSlug: "unique-paths",
+    difficulty: "Medium",
+    pattern: "Dynamic Programming",
+    frequency: "92%",
+    companies: ["Amazon","Google","Adobe"],
+    timeComp: "O(M * N)",
+    spaceComp: "O(N)",
+    intuition: "Robot can only move down or right: dp[r][c] = dp[r-1][c] + dp[r][c-1]. Optimize to 1D row array.",
+    pitfalls: "Grid bounds off-by-one errors; initial base case is dp[c] = 1 for all columns in the top row.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function uniquePaths(m, n) {\n  const row = new Array(n).fill(1);\n  for (let i = 1; i < m; i++) {\n    for (let j = 1; j < n; j++) {\n      row[j] += row[j - 1];\n    }\n  }\n  return row[n - 1];\n}"
+    }
+]
+  },
+  {
+    id: 53,
+    frontendId: 55,
+    title: "Jump Game",
+    titleSlug: "jump-game",
+    difficulty: "Medium",
+    pattern: "Greedy",
+    frequency: "94%",
+    companies: ["Amazon","Meta","Microsoft"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "Work backwards from the end: goal = n - 1. If i + nums[i] >= goal, update goal = i. If goal == 0 at the end, true.",
+    pitfalls: "Using exponential or quadratic DP when a single backwards greedy scan solves it in O(N).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function canJump(nums) {\n  let goal = nums.length - 1;\n  for (let i = nums.length - 2; i >= 0; i--) {\n    if (i + nums[i] >= goal) goal = i;\n  }\n  return goal === 0;\n}"
+    }
+]
+  },
+  {
+    id: 54,
+    frontendId: 133,
+    title: "Clone Graph",
+    titleSlug: "clone-graph",
+    difficulty: "Medium",
+    pattern: "Trees & Graphs",
+    frequency: "92%",
+    companies: ["Meta","Amazon","Google"],
+    timeComp: "O(V + E)",
+    spaceComp: "O(V)",
+    intuition: "Use a Hash Map of original node -> cloned node. Perform DFS/BFS: if neighbor already cloned, reuse reference; otherwise create and recurse.",
+    pitfalls: "Infinite loop in cyclic graphs if visiting tracking is missing.",
+    codeSnippets: []
+  },
+  {
+    id: 55,
+    frontendId: 207,
+    title: "Course Schedule",
+    titleSlug: "course-schedule",
+    difficulty: "Medium",
+    pattern: "Trees & Graphs",
+    frequency: "95%",
+    companies: ["Amazon","Google","Meta"],
+    timeComp: "O(V + E)",
+    spaceComp: "O(V + E)",
+    intuition: "Topological Sort using Kahn's algorithm (indegrees + BFS) or DFS cycle detection using 3 states (unvisited, visiting, visited).",
+    pitfalls: "Disconnected graph components must all be checked.",
+    codeSnippets: []
+  },
+  {
+    id: 56,
+    frontendId: 417,
+    title: "Pacific Atlantic Water Flow",
+    titleSlug: "pacific-atlantic-water-flow",
+    difficulty: "Medium",
+    pattern: "Graphs",
+    frequency: "88%",
+    companies: ["Google","Amazon"],
+    timeComp: "O(M * N)",
+    spaceComp: "O(M * N)",
+    intuition: "Instead of flowing water down from each cell, flow water uphill from Pacific ocean borders and Atlantic borders using BFS/DFS. Return intersection of reachable sets.",
+    pitfalls: "Re-running DFS from every cell causes TLE. Reverse thinking from ocean edges is required.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function pacificAtlantic(heights) {\n  const m = heights.length, n = heights[0].length;\n  const pac = Array.from({ length: m }, () => new Array(n).fill(false));\n  const atl = Array.from({ length: m }, () => new Array(n).fill(false));\n  const dfs = (r, c, visit, prev) => {\n    if (r < 0 || c < 0 || r >= m || c >= n || visit[r][c] || heights[r][c] < prev) return;\n    visit[r][c] = true;\n    dfs(r + 1, c, visit, heights[r][c]);\n    dfs(r - 1, c, visit, heights[r][c]);\n    dfs(r, c + 1, visit, heights[r][c]);\n    dfs(r, c - 1, visit, heights[r][c]);\n  };\n  for (let i = 0; i < m; i++) {\n    dfs(i, 0, pac, heights[i][0]);\n    dfs(i, n - 1, atl, heights[i][n - 1]);\n  }\n  for (let j = 0; j < n; j++) {\n    dfs(0, j, pac, heights[0][j]);\n    dfs(m - 1, j, atl, heights[m - 1][j]);\n  }\n  const res = [];\n  for (let i = 0; i < m; i++) {\n    for (let j = 0; j < n; j++) {\n      if (pac[i][j] && atl[i][j]) res.push([i, j]);\n    }\n  }\n  return res;\n}"
+    }
+]
+  },
+  {
+    id: 57,
+    frontendId: 200,
+    title: "Number of Islands",
+    titleSlug: "number-of-islands",
+    difficulty: "Medium",
+    pattern: "Trees & Graphs",
+    frequency: "99%",
+    companies: ["Amazon","Google","Meta","Bloomberg"],
+    timeComp: "O(R * C)",
+    spaceComp: "O(R * C)",
+    intuition: "Iterate through 2D grid. When encountering '1', increment island count and trigger DFS/BFS to sink/visit all connected '1' cells to '0'.",
+    pitfalls: "Stack overflow on huge grids if using deep recursion without visiting tracking.",
+    codeSnippets: []
+  },
+  {
+    id: 58,
+    frontendId: 128,
+    title: "Longest Consecutive Sequence",
+    titleSlug: "longest-consecutive-sequence",
+    difficulty: "Medium",
+    pattern: "Arrays & Hashing",
+    frequency: "90%",
+    companies: ["Google","Amazon","Spotify"],
+    timeComp: "O(N)",
+    spaceComp: "O(N)",
+    intuition: "Insert all elements into a Set. Only initiate a sequence check if (num - 1) is NOT in the set (identifies sequence starts).",
+    pitfalls: "Checking from every element without the start condition degrades performance to O(N²).",
+    codeSnippets: []
+  },
+  {
+    id: 59,
+    frontendId: 269,
+    title: "Alien Dictionary",
+    titleSlug: "alien-dictionary",
+    difficulty: "Hard",
+    pattern: "Graphs",
+    frequency: "85%",
+    companies: ["Facebook","Airbnb","Pinterest"],
+    timeComp: "O(C)",
+    spaceComp: "O(1) (26 letters)",
+    intuition: "Build a DAG by comparing adjacent words to find lexicographical ordering: character differing first gives directed edge u -> v. Run Topological Sort (Kahn's or DFS).",
+    pitfalls: "Prefix invalid case: word1 is longer than word2 and word2 is a prefix of word1 (e.g. ['abc', 'ab']), which is illegal. Cycle in graph = impossible.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function alienOrder(words) {\n  const adj = new Map();\n  const inDegree = new Map();\n  for (const word of words) {\n    for (const c of word) {\n      if (!adj.has(c)) adj.set(c, new Set());\n      if (!inDegree.has(c)) inDegree.set(c, 0);\n    }\n  }\n  for (let i = 0; i < words.length - 1; i++) {\n    const w1 = words[i], w2 = words[i + 1];\n    const minLen = Math.min(w1.length, w2.length);\n    if (w1.length > w2.length && w1.startsWith(w2)) return \"\";\n    for (let j = 0; j < minLen; j++) {\n      if (w1[j] !== w2[j]) {\n        if (!adj.get(w1[j]).has(w2[j])) {\n          adj.get(w1[j]).add(w2[j]);\n          inDegree.set(w2[j], inDegree.get(w2[j]) + 1);\n        }\n        break;\n      }\n    }\n  }\n  const queue = [];\n  for (const [c, deg] of inDegree.entries()) {\n    if (deg === 0) queue.push(c);\n  }\n  let res = \"\";\n  while (queue.length > 0) {\n    const u = queue.shift();\n    res += u;\n    for (const v of adj.get(u)) {\n      inDegree.set(v, inDegree.get(v) - 1);\n      if (inDegree.get(v) === 0) queue.push(v);\n    }\n  }\n  return res.length === inDegree.size ? res : \"\";\n}"
+    }
+]
+  },
+  {
+    id: 60,
+    frontendId: 261,
+    title: "Graph Valid Tree",
+    titleSlug: "graph-valid-tree",
+    difficulty: "Medium",
+    pattern: "Graphs",
+    frequency: "86%",
+    companies: ["Google","Facebook"],
+    timeComp: "O(V + E)",
+    spaceComp: "O(V + E)",
+    intuition: "A graph is a valid tree iff it has exactly n - 1 edges and is fully connected (no cycles). Check with Union-Find or BFS.",
+    pitfalls: "If edges.length !== n - 1, it cannot be a tree (either has cycles or is disconnected).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function validTree(n, edges) {\n  if (edges.length !== n - 1) return false;\n  const parent = Array.from({ length: n }, (_, i) => i);\n  const find = (i) => parent[i] === i ? i : (parent[i] = find(parent[i]));\n  for (const [u, v] of edges) {\n    const rootU = find(u), rootV = find(v);\n    if (rootU === rootV) return false;\n    parent[rootU] = rootV;\n  }\n  return true;\n}"
+    }
+]
+  },
+  {
+    id: 61,
+    frontendId: 323,
+    title: "Number of Connected Components in an Undirected Graph",
+    titleSlug: "number-of-connected-components-in-an-undirected-graph",
+    difficulty: "Medium",
+    pattern: "Graphs",
+    frequency: "84%",
+    companies: ["Amazon","Twitter","Google"],
+    timeComp: "O(V + E)",
+    spaceComp: "O(V)",
+    intuition: "Start with n components. Use Disjoint Set Union (DSU): whenever an edge successfully merges two disjoint sets, decrement components count by 1.",
+    pitfalls: "Not flattening trees via path compression can lead to degraded DSU runtime.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function countComponents(n, edges) {\n  const parent = Array.from({ length: n }, (_, i) => i);\n  let count = n;\n  const find = (i) => parent[i] === i ? i : (parent[i] = find(parent[i]));\n  for (const [u, v] of edges) {\n    const r1 = find(u), r2 = find(v);\n    if (r1 !== r2) {\n      parent[r1] = r2;\n      count--;\n    }\n  }\n  return count;\n}"
+    }
+]
+  },
+  {
+    id: 62,
+    frontendId: 73,
+    title: "Set Matrix Zeroes",
+    titleSlug: "set-matrix-zeroes",
+    difficulty: "Medium",
+    pattern: "Matrix",
+    frequency: "94%",
+    companies: ["Amazon","Microsoft","Meta"],
+    timeComp: "O(M * N)",
+    spaceComp: "O(1) in-place",
+    intuition: "Use the first row and first column as markers. Track whether the first row/col originally contained zero with two boolean flags.",
+    pitfalls: "Overwriting the first row/col before processing inner cells.",
+    codeSnippets: []
+  },
+  {
+    id: 63,
+    frontendId: 54,
+    title: "Spiral Matrix",
+    titleSlug: "spiral-matrix",
+    difficulty: "Medium",
+    pattern: "Matrix",
+    frequency: "96%",
+    companies: ["Amazon","Microsoft","Apple","Google"],
+    timeComp: "O(M * N)",
+    spaceComp: "O(1) excluding output",
+    intuition: "Maintain 4 boundaries: top, bottom, left, right. Traverse right, shrink top; traverse down, shrink right; traverse left, shrink bottom; traverse up, shrink left.",
+    pitfalls: "Duplicate traversal on single-row or single-column matrices if boundaries cross mid-loop.",
+    codeSnippets: []
+  },
+  {
+    id: 64,
+    frontendId: 48,
+    title: "Rotate Image",
+    titleSlug: "rotate-image",
+    difficulty: "Medium",
+    pattern: "Matrix",
+    frequency: "93%",
+    companies: ["Amazon","Google","Microsoft"],
+    timeComp: "O(N²)",
+    spaceComp: "O(1) in-place",
+    intuition: "Rotate 90 degrees clockwise = Transpose matrix (swap matrix[i][j] with matrix[j][i]) then reverse each row horizontally.",
+    pitfalls: "Swapping during transpose twice, which cancels out the transposition.",
+    codeSnippets: []
+  },
+  {
+    id: 65,
+    frontendId: 79,
+    title: "Word Search",
+    titleSlug: "word-search",
+    difficulty: "Medium",
+    pattern: "Backtracking",
+    frequency: "94%",
+    companies: ["Amazon","Microsoft","Bloomberg"],
+    timeComp: "O(M * N * 3^L)",
+    spaceComp: "O(L)",
+    intuition: "DFS with backtracking. Temporarily mark board[r][c] = '#' while exploring 4 directions, then restore character before backtracking.",
+    pitfalls: "Forgetting to restore cell character upon return (corrupting board state).",
+    codeSnippets: []
+  },
+  {
+    id: 66,
+    frontendId: 57,
+    title: "Insert Interval",
+    titleSlug: "insert-interval",
+    difficulty: "Medium",
+    pattern: "Intervals",
+    frequency: "95%",
+    companies: ["Google","Meta","LinkedIn"],
+    timeComp: "O(N)",
+    spaceComp: "O(N)",
+    intuition: "Linear scan: add all intervals ending before newInterval starts. Then merge all overlapping intervals into newInterval. Finally add remaining.",
+    pitfalls: "Re-sorting array needlessly when linear O(N) pass is optimal.",
+    codeSnippets: []
+  },
+  {
+    id: 67,
+    frontendId: 56,
+    title: "Merge Intervals",
+    titleSlug: "merge-intervals",
+    difficulty: "Medium",
+    pattern: "Intervals",
+    frequency: "99%",
+    companies: ["Meta","Google","Amazon","Bloomberg"],
+    timeComp: "O(N log N)",
+    spaceComp: "O(N)",
+    intuition: "Sort intervals by start time. Iterate through: if curr.start <= lastMerged.end, merge by updating end = max(last.end, curr.end). Else push new interval.",
+    pitfalls: "Failing to sort intervals first, or forgetting Math.max when merging ends.",
+    codeSnippets: []
+  },
+  {
+    id: 68,
+    frontendId: 435,
+    title: "Non-overlapping Intervals",
+    titleSlug: "non-overlapping-intervals",
+    difficulty: "Medium",
+    pattern: "Intervals",
+    frequency: "88%",
+    companies: ["Meta","Amazon"],
+    timeComp: "O(N log N)",
+    spaceComp: "O(1)",
+    intuition: "Greedy choice: sort by end times. Keep intervals that finish earliest to leave maximum room for future intervals.",
+    pitfalls: "Sorting by start times requires tracking min of end times on collision.",
+    codeSnippets: []
+  },
+  {
+    id: 69,
+    frontendId: 252,
+    title: "Meeting Rooms",
+    titleSlug: "meeting-rooms",
+    difficulty: "Easy",
+    pattern: "Intervals",
+    frequency: "90%",
+    companies: ["Facebook","Amazon","Google"],
+    timeComp: "O(N log N)",
+    spaceComp: "O(1)",
+    intuition: "Sort meetings by start time. If intervals[i][0] < intervals[i - 1][1], there is an overlap so a person cannot attend all meetings.",
+    pitfalls: "Touching endpoints (e.g. [0, 30] and [30, 40]) do not overlap.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function canAttendMeetings(intervals) {\n  intervals.sort((a, b) => a[0] - b[0]);\n  for (let i = 1; i < intervals.length; i++) {\n    if (intervals[i][0] < intervals[i - 1][1]) return false;\n  }\n  return true;\n}"
+    }
+]
+  },
+  {
+    id: 70,
+    frontendId: 253,
+    title: "Meeting Rooms II",
+    titleSlug: "meeting-rooms-ii",
+    difficulty: "Medium",
+    pattern: "Intervals",
+    frequency: "96%",
+    companies: ["Amazon","Bloomberg","Google","Facebook"],
+    timeComp: "O(N log N)",
+    spaceComp: "O(N)",
+    intuition: "Chronological Ordering: Extract all start and end times into two sorted arrays. Iterate starts: if start < end, need new room. Else reuse room and advance end pointer.",
+    pitfalls: "Attempting brute force O(N^2) interval comparisons instead of two-pointer sweep-line.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function minMeetingRooms(intervals) {\n  const starts = intervals.map(i => i[0]).sort((a, b) => a - b);\n  const ends = intervals.map(i => i[1]).sort((a, b) => a - b);\n  let rooms = 0, endIdx = 0;\n  for (let i = 0; i < starts.length; i++) {\n    if (starts[i] < ends[endIdx]) {\n      rooms++;\n    } else {\n      endIdx++;\n    }\n  }\n  return rooms;\n}"
+    }
+]
+  },
+  {
+    id: 71,
+    frontendId: 371,
+    title: "Sum of Two Integers",
+    titleSlug: "sum-of-two-integers",
+    difficulty: "Medium",
+    pattern: "Bit Manipulation",
+    frequency: "85%",
+    companies: ["Facebook","Google"],
+    timeComp: "O(1)",
+    spaceComp: "O(1)",
+    intuition: "XOR (a ^ b) yields the sum without carry. AND shifted left ((a & b) << 1) produces the carry. Repeat until carry is zero.",
+    pitfalls: "In Python/JavaScript, handling 32-bit signed integers and negative numbers with mask 0xFFFFFFFF.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function getSum(a, b) {\n  while (b !== 0) {\n    const carry = (a & b) << 1;\n    a = a ^ b;\n    b = carry;\n  }\n  return a;\n}"
+    }
+]
+  },
+  {
+    id: 72,
+    frontendId: 191,
+    title: "Number of 1 Bits",
+    titleSlug: "number-of-1-bits",
+    difficulty: "Easy",
+    pattern: "Bit Manipulation",
+    frequency: "93%",
+    companies: ["Apple","Microsoft","Amazon"],
+    timeComp: "O(k) where k is set bits",
+    spaceComp: "O(1)",
+    intuition: "Brian Kernighan's Algorithm: n = n & (n - 1) flips the lowest set bit to 0. Repeat until n reaches 0.",
+    pitfalls: "Iterating through all 32 bits when only counting set bits.",
+    codeSnippets: []
+  },
+  {
+    id: 73,
+    frontendId: 338,
+    title: "Counting Bits",
+    titleSlug: "counting-bits",
+    difficulty: "Easy",
+    pattern: "Bit Manipulation",
+    frequency: "88%",
+    companies: ["Amazon","Apple"],
+    timeComp: "O(N)",
+    spaceComp: "O(N)",
+    intuition: "DP recurrence: dp[i] = dp[i >> 1] + (i & 1). The number of 1 bits in i is the count in i/2 plus 1 if i is odd.",
+    pitfalls: "Calculating bit counts naively for each number takes O(N log N) instead of linear O(N).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function countBits(n) {\n  const ans = new Array(n + 1).fill(0);\n  for (let i = 1; i <= n; i++) {\n    ans[i] = ans[i >> 1] + (i & 1);\n  }\n  return ans;\n}"
+    }
+]
+  },
+  {
+    id: 74,
+    frontendId: 268,
+    title: "Missing Number",
+    titleSlug: "missing-number",
+    difficulty: "Easy",
+    pattern: "Bit Manipulation",
+    frequency: "95%",
+    companies: ["Amazon","Microsoft","Meta"],
+    timeComp: "O(N)",
+    spaceComp: "O(1)",
+    intuition: "XOR index 0..n with all numbers in array, or use Gauss formula: expected = n*(n+1)/2 minus sum of nums.",
+    pitfalls: "Integer overflow in Gauss formula if numbers are extremely large (though within 32-bit for LeetCode).",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function missingNumber(nums) {\n  let res = nums.length;\n  for (let i = 0; i < nums.length; i++) {\n    res ^= i ^ nums[i];\n  }\n  return res;\n}"
+    }
+]
+  },
+  {
+    id: 75,
+    frontendId: 190,
+    title: "Reverse Bits",
+    titleSlug: "reverse-bits",
+    difficulty: "Easy",
+    pattern: "Bit Manipulation",
+    frequency: "82%",
+    companies: ["Apple","Airbnb"],
+    timeComp: "O(1)",
+    spaceComp: "O(1)",
+    intuition: "Loop 32 times: shift res left by 1, add (n & 1), and right-shift n by 1.",
+    pitfalls: "JavaScript bitwise operators convert operands to 32-bit signed ints; use >>> 0 to treat result as unsigned.",
+    codeSnippets: [
+    {
+        "lang": "JavaScript",
+        "langSlug": "javascript",
+        "code": "function reverseBits(n) {\n  let res = 0;\n  for (let i = 0; i < 32; i++) {\n    res = (res << 1) | (n & 1);\n    n >>>= 1;\n  }\n  return res >>> 0;\n}"
+    }
+]
+  }
 ];
 
 // Helper to provide starter code template for any problem and language
