@@ -77,6 +77,7 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
   const timerIntervalRef = useRef(null);
   const isSpeechActiveRef = useRef(false);
   const pauseTimerRef = useRef(null);
+  const hadMicActiveRef = useRef(false);
 
   // 1. Initialize Speech Recognition & Start Gemini Interview
   useEffect(() => {
@@ -233,10 +234,24 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
 
     utterance.onend = () => {
       setGeminiStatus("listening");
+      if (hadMicActiveRef.current && recognitionRef.current) {
+        try {
+          isSpeechActiveRef.current = true;
+          recognitionRef.current.start();
+          setIsListening(true);
+        } catch (e) {}
+      }
     };
 
     utterance.onerror = () => {
       setGeminiStatus("listening");
+      if (hadMicActiveRef.current && recognitionRef.current) {
+        try {
+          isSpeechActiveRef.current = true;
+          recognitionRef.current.start();
+          setIsListening(true);
+        } catch (e) {}
+      }
     };
 
     window.speechSynthesis.speak(utterance);
@@ -317,7 +332,8 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
       return;
     }
 
-    // Stop microphone temporarily while Gemini thinks
+    // Stop microphone temporarily while Gemini thinks and remembers if mic was on
+    hadMicActiveRef.current = isListening;
     if (isListening) {
       isSpeechActiveRef.current = false;
       try {
@@ -352,7 +368,7 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
           difficulty: track.difficulty,
           title: track.title,
           transcript: updatedTranscript,
-          candidateSpeech: speech,
+          candidateSpeech: formatted,
           focusAreas: track.focusAreas,
         }),
       });
