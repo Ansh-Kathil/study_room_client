@@ -1,4 +1,111 @@
 export const MOCK_INTERVIEW_TRACKS = [
+  // ==========================================
+  // 🌟 SIMPLE & BEGINNER-FRIENDLY STARTER TRACKS
+  // ==========================================
+  {
+    id: "fe-js-basics",
+    topic: "Frontend",
+    title: "JavaScript Fundamentals for Beginners",
+    difficulty: "Beginner",
+    estimatedMinutes: 10,
+    description: "Approachable starter interview covering variables (let vs const vs var), data types, loops, arrays (map/filter), and simple functions.",
+    focusAreas: ["let, const, and var differences", "Array methods (map, filter, forEach)", "Basic arrow functions", "Truthy & Falsy values"],
+    badgeColor: "indigo",
+  },
+  {
+    id: "fe-html-css-basics",
+    topic: "Frontend",
+    title: "HTML, CSS & Web Layout Basics",
+    difficulty: "Beginner",
+    estimatedMinutes: 10,
+    description: "Essential web structure: semantic HTML tags, CSS Box Model (margin vs padding), Flexbox centering, and basic responsive layouts.",
+    focusAreas: ["HTML Semantic Elements (header, nav, main)", "CSS Box Model (content, padding, border, margin)", "Centering items with Flexbox", "Basic media queries"],
+    badgeColor: "indigo",
+  },
+  {
+    id: "fe-react-basics",
+    topic: "Frontend",
+    title: "React Basics: Components, State & Props",
+    difficulty: "Junior",
+    estimatedMinutes: 10,
+    description: "Beginner-friendly React interview: functional components, useState hook, passing props between parent and child, and handling button events.",
+    focusAreas: ["What is a React Component", "Difference between State and Props", "useState hook with simple counters/inputs", "Rendering lists with key props"],
+    badgeColor: "indigo",
+  },
+  {
+    id: "be-rest-intro",
+    topic: "Backend",
+    title: "REST APIs & Express.js Basics",
+    difficulty: "Beginner",
+    estimatedMinutes: 10,
+    description: "Everyday web backend basics: what is an API, HTTP methods (GET, POST, PUT, DELETE), JSON responses, and common HTTP status codes (200, 404, 500).",
+    focusAreas: ["What is a REST API", "HTTP Verbs (GET vs POST vs DELETE)", "JSON Request & Response body", "HTTP Status codes (200, 400, 404, 500)"],
+    badgeColor: "emerald",
+  },
+  {
+    id: "be-nodejs-starter",
+    topic: "Backend",
+    title: "Node.js & NPM Fundamentals",
+    difficulty: "Junior",
+    estimatedMinutes: 10,
+    description: "Introduction to JavaScript outside the browser: what is Node.js, package.json dependencies, npm install, and creating a simple server.",
+    focusAreas: ["What is Node.js", "package.json & npm packages", "Importing and exporting modules", "Writing a simple GET route"],
+    badgeColor: "emerald",
+  },
+  {
+    id: "dbms-sql-starter",
+    topic: "DBMS",
+    title: "SQL & Relational Database Basics",
+    difficulty: "Beginner",
+    estimatedMinutes: 10,
+    description: "Introductory database concepts: tables, rows, columns, writing SELECT/WHERE queries, Primary Keys vs Foreign Keys, and simple joins.",
+    focusAreas: ["SELECT, WHERE, and ORDER BY queries", "Primary Keys and Foreign Keys", "Simple INNER JOIN between two tables", "SQL vs storing data in JSON files"],
+    badgeColor: "rose",
+  },
+  {
+    id: "oops-basics",
+    topic: "OOPS",
+    title: "OOP Fundamentals (Classes & Objects)",
+    difficulty: "Beginner",
+    estimatedMinutes: 10,
+    description: "Clean introduction to Object-Oriented Programming: classes vs objects, Encapsulation, and Inheritance explained with simple relatable examples.",
+    focusAreas: ["Class blueprint vs Object instance", "Encapsulation (private fields & getters/setters)", "Inheritance with Animal or Car example", "Constructor functions"],
+    badgeColor: "amber",
+  },
+  {
+    id: "cn-web-basics",
+    topic: "CN",
+    title: "How the Internet Works: Browser to Server",
+    difficulty: "Beginner",
+    estimatedMinutes: 10,
+    description: "Fundamental networking concepts: what happens when you type a URL, client vs server, what is an IP address, DNS lookup, and HTTP vs HTTPS.",
+    focusAreas: ["What happens when you enter a URL", "Client vs Server roles", "DNS (Domain Name System) basics", "HTTP vs Secure HTTPS"],
+    badgeColor: "cyan",
+  },
+  {
+    id: "tools-git-basics",
+    topic: "Fullstack",
+    title: "Git & GitHub Version Control Basics",
+    difficulty: "Beginner",
+    estimatedMinutes: 10,
+    description: "Collaborative coding essentials: git init, add, commit, push, pull, branches, and how git prevents code from being accidentally lost.",
+    focusAreas: ["git add and git commit flow", "git push and pull with remote GitHub", "Creating and switching branches", "Resolving simple merge conflicts"],
+    badgeColor: "purple",
+  },
+  {
+    id: "fit-intro-projects",
+    topic: "Fullstack",
+    title: "Junior Technical Fit & Project Walkthrough",
+    difficulty: "Beginner",
+    estimatedMinutes: 10,
+    description: "Personal and technical project showcase: 'Tell me about yourself', walking through a project you created, and how you debug issues.",
+    focusAreas: ["Self-introduction for developers", "Explaining a project you built", "How you debug an error you've never seen", "What technologies you want to learn next"],
+    badgeColor: "purple",
+  },
+
+  // ==========================================
+  // 🚀 ADVANCED & SENIOR FAANG ARCHITECTURE TRACKS
+  // ==========================================
   // 1. FRONTEND
   {
     id: "fe-react-arch",
@@ -243,6 +350,7 @@ export const MOCK_TOPICS = [
 
 export const MOCK_DIFFICULTIES = [
   "ALL",
+  "Beginner",
   "Junior",
   "Mid-Level",
   "Senior",

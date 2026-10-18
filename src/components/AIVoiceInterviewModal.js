@@ -40,6 +40,7 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
   const chatBottomRef = useRef(null);
   const timerIntervalRef = useRef(null);
   const isSpeechActiveRef = useRef(false);
+  const manualPrefixRef = useRef("");
 
   // 1. Initialize Speech Recognition & Start Gemini Interview
   useEffect(() => {
@@ -53,20 +54,17 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
         recognition.interimResults = true;
         recognition.lang = "en-US";
 
+        // Accurate non-duplicating speech reconstruction across continuous audio stream
         recognition.onresult = (event) => {
-          let interim = "";
-          let final = "";
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              final += event.results[i][0].transcript + " ";
-            } else {
-              interim += event.results[i][0].transcript;
-            }
+          let sessionTranscript = "";
+          for (let i = 0; i < event.results.length; ++i) {
+            sessionTranscript += event.results[i][0].transcript + " ";
           }
-          setCandidateSpeech((prev) => {
-            const base = final ? prev + " " + final : prev;
-            return (base + " " + interim).replace(/\s+/g, " ").trim();
-          });
+          const basePrefix = manualPrefixRef.current;
+          const cleaned = (basePrefix ? basePrefix + " " + sessionTranscript : sessionTranscript)
+            .replace(/\s+/g, " ")
+            .trim();
+          setCandidateSpeech(cleaned);
         };
 
         recognition.onerror = (err) => {
@@ -204,6 +202,7 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
         window.speechSynthesis.cancel();
       }
       try {
+        manualPrefixRef.current = candidateSpeech.trim();
         isSpeechActiveRef.current = true;
         recognitionRef.current?.start();
         setIsListening(true);
@@ -242,6 +241,7 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
     const updatedTranscript = [...transcript, candidateMsg];
     setTranscript(updatedTranscript);
     setCandidateSpeech("");
+    manualPrefixRef.current = "";
     setGeminiStatus("thinking");
 
     try {
