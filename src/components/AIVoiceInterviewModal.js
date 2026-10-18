@@ -26,153 +26,28 @@ import { toast } from "sonner";
 import { apiRequest } from "@/lib/api";
 import InterviewReportView from "./InterviewReportView";
 
-// 📚 Smart technical vocabulary dictionary and auto-capitalizer for cleaner speech-to-text
-const TECH_DICTIONARY = [
-  // Languages
-  [/\bjavascript\b/gi, "JavaScript"],
-  [/\btypescript\b/gi, "TypeScript"],
-  [/\bpython\b/gi, "Python"],
-  [/\bgolang\b/gi, "Golang"],
-  [/\bruby\b/gi, "Ruby"],
-  [/\brust\b/gi, "Rust"],
-  [/\bphp\b/gi, "PHP"],
-  [/\bc\s*\+\+/gi, "C++"],
-  [/\bc\s*sharp\b/gi, "C#"],
-
-  // Frontend frameworks & libs
-  [/\breact\s*native\b/gi, "React Native"],
-  [/\breact\s*js\b/gi, "React"],
-  [/\breact\b/gi, "React"],
-  [/\bnext\s*js\b/gi, "Next.js"],
-  [/\bnextjs\b/gi, "Next.js"],
-  [/\bvue\s*js\b/gi, "Vue"],
-  [/\bvue\b/gi, "Vue"],
-  [/\bangular\b/gi, "Angular"],
-  [/\bsvelte\b/gi, "Svelte"],
-  [/\btailwind\s*css\b/gi, "Tailwind CSS"],
-  [/\btailwind\b/gi, "Tailwind"],
-  [/\bbootstrap\b/gi, "Bootstrap"],
-
-  // Backend & Servers
-  [/\bnode\s*js\b/gi, "Node.js"],
-  [/\bnodejs\b/gi, "Node.js"],
-  [/\bexpress\s*js\b/gi, "Express"],
-  [/\bexpress\b/gi, "Express"],
-  [/\bnest\s*js\b/gi, "NestJS"],
-  [/\bdjango\b/gi, "Django"],
-  [/\bflask\b/gi, "Flask"],
-  [/\bfast\s*api\b/gi, "FastAPI"],
-  [/\bspring\s*boot\b/gi, "Spring Boot"],
-
-  // Web & Protocols
-  [/\bhtml\s*5\b/gi, "HTML5"],
-  [/\bhtml\b/gi, "HTML"],
-  [/\bcss\s*3\b/gi, "CSS3"],
-  [/\bcss\b/gi, "CSS"],
-  [/\brest\s*apis?\b/gi, "REST API"],
-  [/\brestful\s*apis?\b/gi, "RESTful API"],
-  [/\bgraphql\b/gi, "GraphQL"],
-  [/\bgrpc\b/gi, "gRPC"],
-  [/\bweb\s*sockets?\b/gi, "WebSocket"],
-  [/\bhttp\b/gi, "HTTP"],
-  [/\bhttps\b/gi, "HTTPS"],
-  [/\btcp\b/gi, "TCP"],
-  [/\budp\b/gi, "UDP"],
-  [/\bdns\b/gi, "DNS"],
-  [/\burl\b/gi, "URL"],
-  [/\burls\b/gi, "URLs"],
-  [/\bjson\b/gi, "JSON"],
-  [/\bjwt\b/gi, "JWT"],
-  [/\bcors\b/gi, "CORS"],
-
-  // Databases & Storage
-  [/\bsql\b/gi, "SQL"],
-  [/\bnosql\b/gi, "NoSQL"],
-  [/\bmongodb\b/gi, "MongoDB"],
-  [/\bpostgres(ql)?\b/gi, "PostgreSQL"],
-  [/\bmysql\b/gi, "MySQL"],
-  [/\bsqlite\b/gi, "SQLite"],
-  [/\bredis\b/gi, "Redis"],
-  [/\bprisma\b/gi, "Prisma"],
-
-  // Concepts & Architecture
-  [/\bdom\b/gi, "DOM"],
-  [/\bvdom\b/gi, "Virtual DOM"],
-  [/\boops?\b/gi, "OOP"],
-  [/\bsolid\b/gi, "SOLID"],
-  [/\bmvc\b/gi, "MVC"],
-  [/\bcrud\b/gi, "CRUD"],
-  [/\bacid\b/gi, "ACID"],
-  [/\bci\s*\/\s*cd\b/gi, "CI/CD"],
-  [/\bfront\s*end\b/gi, "frontend"],
-  [/\bback\s*end\b/gi, "backend"],
-  [/\bfull\s*stack\b/gi, "fullstack"],
-
-  // React specific
-  [/\buse\s*state\b/gi, "useState"],
-  [/\buse\s*effect\b/gi, "useEffect"],
-  [/\buse\s*context\b/gi, "useContext"],
-  [/\buse\s*memo\b/gi, "useMemo"],
-  [/\buse\s*callback\b/gi, "useCallback"],
-  [/\buse\s*ref\b/gi, "useRef"],
-  [/\bprops\b/gi, "props"],
-
-  // Tools & Cloud
-  [/\bgit\s*hub\b/gi, "GitHub"],
-  [/\bgit\s*lab\b/gi, "GitLab"],
-  [/\bgit\b/gi, "Git"],
-  [/\bdocker\b/gi, "Docker"],
-  [/\bkubernetes\b/gi, "Kubernetes"],
-  [/\bk8s\b/gi, "K8s"],
-  [/\baws\b/gi, "AWS"],
-  [/\bgcp\b/gi, "GCP"],
-  [/\bazure\b/gi, "Azure"],
-  [/\brag\b/gi, "RAG"],
-  [/\bllms?\b/gi, "LLM"],
-  [/\bgemini\b/gi, "Gemini"],
-];
-
 const ACCENTS = [
-  { code: "en-IN", label: "English (India)" },
   { code: "en-US", label: "English (US)" },
+  { code: "en-IN", label: "English (India)" },
   { code: "en-GB", label: "English (UK)" },
   { code: "en-AU", label: "English (Australia)" },
   { code: "en-CA", label: "English (Canada)" },
 ];
 
-const cleanSpokenText = (raw) => {
+// Clean formatting for final submitted response
+const formatCandidateMessage = (raw) => {
   if (!raw) return "";
   let text = raw.trim();
-
-  // 1. Spacing cleanup before punctuation: "hello , world" -> "hello, world"
-  text = text.replace(/\s+([,.:;?!])/g, "$1");
-
-  // 2. Ensure single space after punctuation: "hello.world" -> "hello. world"
-  text = text.replace(/([.?!])([A-Za-z])/g, "$1 $2");
-
-  // 3. Capitalize first letter of string
   if (text.length > 0) {
     text = text.charAt(0).toUpperCase() + text.slice(1);
   }
-
-  // 4. Capitalize standalone 'I' and contractions
-  text = text
+  return text
     .replace(/\bi\b/g, "I")
     .replace(/\bi'm\b/g, "I'm")
     .replace(/\bi've\b/g, "I've")
     .replace(/\bi'll\b/g, "I'll")
-    .replace(/\bi'd\b/g, "I'd");
-
-  // 5. Capitalize after sentence-ending punctuation (., ?, !)
-  text = text.replace(/(^\s*|[.?!]\s+)([a-z])/g, (_, p1, p2) => p1 + p2.toUpperCase());
-
-  // 6. Standardize technical terminology from dictionary
-  for (const [pattern, replacement] of TECH_DICTIONARY) {
-    text = text.replace(pattern, replacement);
-  }
-
-  // 7. Collapse any remaining double spaces
-  return text.replace(/\s{2,}/g, " ");
+    .replace(/\bi'd\b/g, "I'd")
+    .replace(/\s+/g, " ");
 };
 
 export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompleted }) {
@@ -187,11 +62,6 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("studyroom_interview_voice_lang");
       if (saved) return saved;
-      const navLang = navigator.language || "";
-      if (navLang.startsWith("en-IN")) return "en-IN";
-      if (navLang.startsWith("en-GB")) return "en-GB";
-      if (navLang.startsWith("en-AU")) return "en-AU";
-      if (navLang.startsWith("en-CA")) return "en-CA";
     }
     return "en-US";
   });
@@ -202,10 +72,10 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
   const [reportData, setReportData] = useState(null);
 
   const recognitionRef = useRef(null);
+  const finalTranscriptRef = useRef("");
   const chatBottomRef = useRef(null);
   const timerIntervalRef = useRef(null);
   const isSpeechActiveRef = useRef(false);
-  const manualPrefixRef = useRef("");
   const pauseTimerRef = useRef(null);
 
   // 1. Initialize Speech Recognition & Start Gemini Interview
@@ -219,47 +89,44 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
         recognition.interimResults = true;
         recognition.lang = speechLang;
 
-        // Clean, structured speech capture avoiding duplication across all chunks
+        // Accurate, non-duplicating speech recognition using canonical Web Speech API architecture
         recognition.onresult = (event) => {
-          let finalized = "";
           let interim = "";
 
-          for (let i = 0; i < event.results.length; ++i) {
-            const part = event.results[i][0].transcript;
+          // Process only new results starting from event.resultIndex
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            const chunk = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-              finalized += part + " ";
+              finalTranscriptRef.current += chunk + " ";
             } else {
-              interim += part + " ";
+              interim += chunk;
             }
           }
 
-          const basePrefix = manualPrefixRef.current;
-          // Clean the entire stream continuously (finalized + interim in-flight words)
-          const fullRaw = (finalized + interim).trim();
-          const cleanedFull = cleanSpokenText(fullRaw);
-          const cleanedInterim = cleanSpokenText(interim.trim());
-
-          const combined = (basePrefix ? basePrefix + " " + cleanedFull : cleanedFull)
-            .replace(/\s+/g, " ")
-            .trim();
-
+          const combined = (finalTranscriptRef.current + interim).replace(/\s+/g, " ").trim();
           setCandidateSpeech(combined);
-          setInterimSpeech(cleanedInterim);
+          setInterimSpeech(interim.trim());
 
-          // Detect natural candidate pause to assist with prompt feedback
+          // Detect natural pauses to indicate user is finished speaking
           if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
           setPauseDetected(false);
-          if (combined.length > 15) {
+          if (combined.length > 8) {
             pauseTimerRef.current = setTimeout(() => {
               setPauseDetected(true);
-            }, 2500);
+            }, 2000);
           }
         };
 
         recognition.onerror = (err) => {
-          console.warn("Speech recognition error:", err.error);
-          setIsListening(false);
-          isSpeechActiveRef.current = false;
+          console.warn("Speech recognition notice:", err.error);
+          // 'no-speech' is a normal browser timeout when candidate pauses; do NOT kill active session
+          if (err.error === "no-speech") return;
+
+          if (err.error === "not-allowed" || err.error === "audio-capture") {
+            toast.error("Microphone access was blocked. Please allow microphone permission in your browser.");
+            setIsListening(false);
+            isSpeechActiveRef.current = false;
+          }
         };
 
         recognition.onend = () => {
@@ -395,9 +262,9 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
 
   // 5. Clear / Reset Candidate Input Bar
   const handleClearSpeech = () => {
+    finalTranscriptRef.current = "";
     setCandidateSpeech("");
     setInterimSpeech("");
-    manualPrefixRef.current = "";
     setPauseDetected(false);
     if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
     if (isListening && recognitionRef.current) {
@@ -429,7 +296,7 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
         window.speechSynthesis.cancel();
       }
       try {
-        manualPrefixRef.current = candidateSpeech.trim();
+        finalTranscriptRef.current = candidateSpeech.trim() ? candidateSpeech.trim() + " " : "";
         isSpeechActiveRef.current = true;
         recognitionRef.current?.start();
         setIsListening(true);
@@ -444,8 +311,8 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
 
   // 7. Send Candidate Answer to Gemini
   const handleSendAnswer = async () => {
-    const speech = candidateSpeech.trim();
-    if (!speech) {
+    const rawSpeech = candidateSpeech.trim();
+    if (!rawSpeech) {
       toast.error("Please speak or type your answer before sending!");
       return;
     }
@@ -463,16 +330,18 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
     setPauseDetected(false);
     if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
 
+    const formatted = formatCandidateMessage(rawSpeech);
+
     const candidateMsg = {
       speaker: "candidate",
-      text: speech,
+      text: formatted,
       timestamp: new Date(),
     };
 
     const updatedTranscript = [...transcript, candidateMsg];
     setTranscript(updatedTranscript);
     setCandidateSpeech("");
-    manualPrefixRef.current = "";
+    finalTranscriptRef.current = "";
     setGeminiStatus("thinking");
 
     try {
@@ -854,7 +723,10 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
               <input
                 type="text"
                 value={candidateSpeech}
-                onChange={(e) => setCandidateSpeech(e.target.value)}
+                onChange={(e) => {
+                  setCandidateSpeech(e.target.value);
+                  finalTranscriptRef.current = e.target.value ? e.target.value.trim() + " " : "";
+                }}
                 placeholder={
                   isListening
                     ? "Listening... Speak naturally (words appear here live)"
