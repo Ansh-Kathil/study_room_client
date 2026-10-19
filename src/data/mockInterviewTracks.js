@@ -104,6 +104,40 @@ export const MOCK_INTERVIEW_TRACKS = [
   },
 
   // ==========================================
+  // 🤝 HR & BEHAVIORAL INTERVIEW ROUNDS
+  // ==========================================
+  {
+    id: "hr-behavioral-fit",
+    topic: "HR",
+    title: "HR Behavioral & Culture Fit Round",
+    difficulty: "Beginner",
+    estimatedMinutes: 12,
+    description: "Core HR screening: Tell me about yourself, workplace conflict resolution, why this company, strengths/weaknesses, and career aspirations.",
+    focusAreas: ["Tell me about yourself pitch", "Conflict resolution with teammates", "Why our company & motivation", "Handling constructive criticism"],
+    badgeColor: "violet",
+  },
+  {
+    id: "hr-leadership-star",
+    topic: "HR",
+    title: "HR Leadership & Conflict Management (STAR Method)",
+    difficulty: "Mid-Level",
+    estimatedMinutes: 15,
+    description: "In-depth behavioral assessment using STAR method: high-pressure deadlines, cross-functional collaboration, failure lessons, and mentoring juniors.",
+    focusAreas: ["STAR Method storytelling", "Managing tight deadlines & ambiguity", "Disagreed and committed scenario", "Biggest career mistake and lessons learned"],
+    badgeColor: "violet",
+  },
+  {
+    id: "hr-exec-leadership",
+    topic: "HR",
+    title: "Senior Engineering HR & Cultural Alignment",
+    difficulty: "Senior",
+    estimatedMinutes: 15,
+    description: "Executive HR round assessing organizational influence, stakeholder management, retaining high-performers, and driving company culture.",
+    focusAreas: ["Engineering culture & mentorship", "Managing difficult stakeholders", "Driving team morale during burnout", "Work ethic & ethical dilemmas"],
+    badgeColor: "violet",
+  },
+
+  // ==========================================
   // 🚀 ADVANCED & SENIOR FAANG ARCHITECTURE TRACKS
   // ==========================================
   // 1. FRONTEND
@@ -337,6 +371,7 @@ export const MOCK_INTERVIEW_TRACKS = [
 
 export const MOCK_TOPICS = [
   "ALL",
+  "HR",
   "Frontend",
   "Backend",
   "Fullstack",

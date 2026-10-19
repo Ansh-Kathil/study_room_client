@@ -594,6 +594,7 @@ export default function InterviewPrepPage({ embedded = false }) {
                       {filtered.map((track) => {
                         const getTopicBadge = (topic) => {
                           const map = {
+                            HR: "bg-violet-500/10 text-violet-400 border-violet-500/30",
                             Frontend: "bg-indigo-500/10 text-indigo-400 border-indigo-500/30",
                             Backend: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
                             Fullstack: "bg-purple-500/10 text-purple-400 border-purple-500/30",

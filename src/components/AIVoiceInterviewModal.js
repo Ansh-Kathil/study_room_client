@@ -70,6 +70,7 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
   const [isEnding, setIsEnding] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [reportData, setReportData] = useState(null);
+  const [isConcluded, setIsConcluded] = useState(false);
 
   const recognitionRef = useRef(null);
   const finalTranscriptRef = useRef("");
@@ -373,6 +374,11 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
         }),
       });
 
+      if (data.isConcluded) {
+        setIsConcluded(true);
+        hadMicActiveRef.current = false;
+      }
+
       if (data.reply) {
         const interviewerMsg = {
           speaker: "interviewer",
@@ -587,7 +593,9 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
                 <span className="text-xs font-bold text-slate-200">Gemini Staff Interviewer</span>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 ${
-                    geminiStatus === "speaking"
+                    isConcluded
+                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                      : geminiStatus === "speaking"
                       ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
                       : geminiStatus === "thinking"
                       ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
@@ -597,7 +605,9 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
                   }`}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                  {geminiStatus === "speaking"
+                  {isConcluded
+                    ? "Interview Concluded"
+                    : geminiStatus === "speaking"
                     ? "Speaking..."
                     : geminiStatus === "thinking"
                     ? "Evaluating Answer..."
@@ -607,7 +617,9 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                Answer verbally using your microphone, or type your response below.
+                {isConcluded
+                  ? "All interview questions finished! Click 'End & Evaluate' to see your comprehensive scorecard."
+                  : "Answer verbally using your microphone, or type your response below."}
               </p>
             </div>
           </div>
@@ -708,6 +720,27 @@ export default function AIVoiceInterviewModal({ track, onClose, onInterviewCompl
                 Click Send Response or press Enter
               </span>
             )}
+          </div>
+        )}
+
+        {/* Interview Concluded Banner */}
+        {isConcluded && (
+          <div className="px-4 py-3 bg-gradient-to-r from-emerald-950/70 via-slate-900 to-indigo-950/70 border-t border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+            <div className="flex items-center gap-2.5 text-emerald-200 text-xs">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
+              <span>
+                <strong>Round Completed!</strong> All questions have been answered. Ready to generate your scorecard?
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleEndInterview}
+              disabled={isEnding}
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all shrink-0 cursor-pointer"
+            >
+              {isEnding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Award className="w-3.5 h-3.5" />}
+              <span>{isEnding ? "Evaluating All Answers..." : "End & Generate Detailed Report"}</span>
+            </button>
           </div>
         )}
 
